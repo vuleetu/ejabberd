@@ -1304,7 +1304,8 @@ terminate(_Reason, StateName, StateData) ->
 			    presence_broadcast(
 			      StateData, From, StateData#state.pres_i, Packet)
 		    end
-	    end;
+	    end,
+	    resend_unacked_stanzas(StateData);
 	_ ->
 	    ok
     end,
@@ -1415,6 +1416,23 @@ handle_ack_element({xmlelement, Name, Attrs, _SubEls}, StateData) ->
 	    ack_pending(xml:get_attr_s("b", Attrs), StateData);
 	"a" ->
 	    ack_pending(xml:get_attr_s("b", Attrs), StateData)
+    end.
+
+resend_unacked_stanzas(StateData) ->
+    case StateData#state.ack_enabled of
+	false ->
+	    ok;
+	true ->
+	    %% Connection was terminated, and we have a few stanzas
+	    %% that were never acknowledged.  Try to route them again.
+	    lists:foreach(
+	      fun({_, {xmlelement, _Name, Attrs, _SubEls} = El}) ->
+		      From_s = xml:get_attr_s("from", Attrs),
+		      From = jlib:string_to_jid(From_s),
+		      To_s = xml:get_attr_s("to", Attrs),
+		      To = jlib:string_to_jid(To_s),
+		      ejabberd_router:route(From, To, El)
+	      end, queue:to_list(StateData#state.ack_out_pending))
     end.
 
 ack_pending(BStr, StateData) ->
