@@ -297,7 +297,7 @@ wait_for_stream({xmlstreamstart, _Name, Attrs}, StateData) ->
 						 [{"xmlns", ?NS_SESSION}], []},
 						%% for reconnect, add elements here
 						{xmlelement, "ack",
-						 [{"xmlns", ?NS_FEATURE_ACK}]}]}),
+						 [{"xmlns", ?NS_FEATURE_ACK}], []}]}),
 					    fsm_next_state(wait_for_bind,
 						       StateData#state{
 							 server = Server,
