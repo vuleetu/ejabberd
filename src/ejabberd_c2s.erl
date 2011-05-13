@@ -68,6 +68,11 @@
 		pres_invis = false,
 		privacy_list = none,
 		ip,
+		ack_enabled = false,
+		%% ack_out_pending is a queue of {N, El}
+		ack_out_pending = queue:new(),
+		%% ack_out_latest is a number
+		ack_out_latest = 0,
 		lang}).
 
 %-define(DBGFSM, true).
@@ -709,8 +714,8 @@ wait_for_sasl_response(closed, StateData) ->
 
 
 wait_for_bind({xmlstreamelement, El}, StateData) ->
-    case jlib:iq_query_info(El) of
-	#iq{type = set, xmlns = ?NS_BIND, sub_el = SubEl} = IQ ->
+    case {jlib:iq_query_info(El), is_ack_packet(El)} of
+	{#iq{type = set, xmlns = ?NS_BIND, sub_el = SubEl} = IQ, _} ->
 	    U = StateData#state.user,
 	    R1 = xml:get_path_s(SubEl, [{elem, "resource"}, cdata]),
 	    R = case jlib:resourceprep(R1) of
@@ -737,6 +742,8 @@ wait_for_bind({xmlstreamelement, El}, StateData) ->
 		    fsm_next_state(wait_for_session,
 				   StateData#state{resource = R, jid = JID})
 	    end;
+	{_, true} ->
+	    fsm_next_state(wait_for_bind, handle_ack_element(El, StateData));
 	_ ->
 	    fsm_next_state(wait_for_bind, StateData)
     end;
@@ -758,8 +765,8 @@ wait_for_bind(closed, StateData) ->
 
 
 wait_for_session({xmlstreamelement, El}, StateData) ->
-    case jlib:iq_query_info(El) of
-	#iq{type = set, xmlns = ?NS_SESSION} ->
+    case {jlib:iq_query_info(El), is_ack_packet(El)} of
+	{#iq{type = set, xmlns = ?NS_SESSION}, _} ->
 	    U = StateData#state.user,
 	    R = StateData#state.resource,
 	    JID = StateData#state.jid,
@@ -803,6 +810,8 @@ wait_for_session({xmlstreamelement, El}, StateData) ->
 		    send_element(StateData, Err),
 		    fsm_next_state(wait_for_session, StateData)
 	    end;
+	{_, true} ->
+	    fsm_next_state(wait_for_session, handle_ack_element(El, StateData));
 	_ ->
 	    fsm_next_state(wait_for_session, StateData)
     end;
@@ -849,8 +858,10 @@ session_established({xmlstreamelement, El}, StateData) ->
 		    NewEl1
 	    end,
     NewState =
-	case ToJID of
-	    error ->
+	case {ToJID, is_ack_packet(El)} of
+	    {_, true} ->
+		handle_ack_element(El, StateData);
+	    {error, _} ->
 		case xml:get_attr_s("type", Attrs) of
 		    "error" -> StateData;
 		    "result" -> StateData;
@@ -1352,6 +1363,56 @@ get_auth_tags([_ | L], U, P, D, R) ->
     get_auth_tags(L, U, P, D, R);
 get_auth_tags([], U, P, D, R) ->
     {U, P, D, R}.
+
+
+is_ack_packet({xmlelement, _Name, Attrs, _SubEls}) ->
+    xml:get_attr_s("xmlns", Attrs) == ?NS_ACK.
+
+handle_ack_element({xmlelement, Name, Attrs, _SubEls}, StateData) ->
+    case Name of
+	"ping" ->
+	    send_element(StateData,
+			 {xmlelement, "pong",
+			  [{"xmlns", ?NS_ACK}], []}),
+	    StateData;
+	"enable" ->
+	    %% We don't support session restart for now
+	    send_element(StateData,
+			 {xmlelement, "enabled",
+			  [{"xmlns", ?NS_ACK}], []}),
+	    StateData#state{ack_enabled = true};
+	"r" ->
+	    C = xml:get_attr_s("c", Attrs),
+	    send_element(StateData,
+			 {xmlelement, "a",
+			  [{"xmlns", ?NS_ACK},
+			   {"b", C},
+			   {"c", integer_to_list(StateData#state.ack_out_latest)}],
+			  []}),
+	    ack_pending(xml:get_attr_s("b", Attrs), StateData);
+	"a" ->
+	    ack_pending(xml:get_attr_s("b", Attrs), StateData)
+    end.
+
+ack_pending(BStr, StateData) ->
+    case BStr of
+	"" ->
+	    StateData;
+	_ ->
+	    B = list_to_integer(BStr),
+	    %% All stanzas numbered B or less have been successfully acked.
+	    Unacked = StateData#state.ack_out_pending,
+	    StateData#state{ack_out_pending = cut_below(B, Unacked)}
+    end.
+
+cut_below(B, Q) ->
+    %% Remove items from the head until the first item has sequence number > B
+    case queue:out(Q) of
+	{{value, {N, _El}}, Q1} when N =< B ->
+	    cut_below(B, Q1);
+	_ ->
+	    Q
+    end.
 
 
 process_presence_probe(From, To, StateData) ->
