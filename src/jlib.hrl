@@ -53,8 +53,10 @@
 -define(NS_FEATURE_IQAUTH, "http://jabber.org/features/iq-auth").
 -define(NS_FEATURE_IQREGISTER, "http://jabber.org/features/iq-register").
 -define(NS_FEATURE_COMPRESS, "http://jabber.org/features/compress").
+-define(NS_FEATURE_ACK, "http://www.xmpp.org/extensions/xep-0198.html#ns").
 
 -define(NS_COMPRESS,     "http://jabber.org/protocol/compress").
+-define(NS_ACK,          "http://www.xmpp.org/extensions/xep-0198.html#ns").
 
 -define(NS_CAPS,          "http://jabber.org/protocol/caps").
 
