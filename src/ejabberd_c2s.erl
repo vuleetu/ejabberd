@@ -71,8 +71,7 @@
 		ack_enabled = false,
 		%% ack_out_pending is a queue of {N, El}
 		ack_out_pending = queue:new(),
-		%% ack_out_latest is a number
-		ack_out_latest = 0,
+		ack_out_next = 0,
 		lang}).
 
 %-define(DBGFSM, true).
@@ -1230,13 +1229,12 @@ handle_info({route, From, To, Packet}, StateName, StateData) ->
 						jlib:jid_to_string(To),
 						NewAttrs),
 	    FixedPacket = {xmlelement, Name, Attrs2, Els},
-	    Text = xml:element_to_string(FixedPacket),
-	    send_text(StateData, Text),
+	    NewState1 = send_element_ack(NewState, FixedPacket),
 	    ejabberd_hooks:run(user_receive_packet,
 			       StateData#state.server,
 			       [StateData#state.jid, From, To, FixedPacket]),
 	    ejabberd_hooks:run(c2s_loop_debug, [{route, From, To, Packet}]),
-	    fsm_next_state(StateName, NewState);
+	    fsm_next_state(StateName, NewState1);
 	true ->
 	    ejabberd_hooks:run(c2s_loop_debug, [{route, From, To, Packet}]),
 	    fsm_next_state(StateName, NewState)
@@ -1329,6 +1327,32 @@ send_text(StateData, Text) ->
 send_element(StateData, El) ->
     send_text(StateData, xml:element_to_string(El)).
 
+send_element_ack(StateData, El) ->
+    ElText = xml:element_to_string(El),
+    {AckText, NewState} =
+	case StateData#state.ack_enabled of
+	    false ->
+		{[], StateData};
+	    true ->
+		%% Here we send an ack request after each stanza.
+		%% That might not be the optimal way.
+
+		SeqNumber = StateData#state.ack_out_next,
+		%% We might want to include a 'b' attribute too,
+		%% if the client has unacked stanzas.
+		AckEl = {xmlelement, "r",
+			 [{"xmlns", ?NS_ACK},
+			  {"c", integer_to_list(SeqNumber)}], []},
+
+		NextNumber = SeqNumber + 1,
+		Pending = queue:in({SeqNumber, El}, StateData#state.ack_out_pending),
+		{xml:element_to_string(AckEl),
+		 StateData#state{ack_out_next = NextNumber,
+				 ack_out_pending = Pending}}
+	end,
+    send_text(NewState, [ElText, AckText]),
+    NewState.
+
 
 new_id() ->
     randoms:get_string().
@@ -1386,8 +1410,7 @@ handle_ack_element({xmlelement, Name, Attrs, _SubEls}, StateData) ->
 	    send_element(StateData,
 			 {xmlelement, "a",
 			  [{"xmlns", ?NS_ACK},
-			   {"b", C},
-			   {"c", integer_to_list(StateData#state.ack_out_latest)}],
+			   {"b", C}],
 			  []}),
 	    ack_pending(xml:get_attr_s("b", Attrs), StateData);
 	"a" ->
