@@ -394,8 +394,8 @@ wait_for_stream({xmlstreamstart, _Name, Attrs}, StateData) ->
 						 {xmlelement, "session",
 						  [{"xmlns", ?NS_SESSION}], []},
 						 %% for reconnect, add elements here
-						 {xmlelement, "ack",
-						  [{"xmlns", ?NS_FEATURE_ACK}], []}]
+						 {xmlelement, "sm",
+						  [{"xmlns", ?NS_STREAM_MGNT}], []}]
 						++ RosterVersioningFeature
 						++ ejabberd_hooks:run_fold(
 						     c2s_stream_features,
@@ -1582,7 +1582,7 @@ send_element_ack(StateData, El) ->
 		%% We might want to include a 'b' attribute too,
 		%% if the client has unacked stanzas.
 		AckEl = {xmlelement, "r",
-			 [{"xmlns", ?NS_ACK},
+			 [{"xmlns", ?NS_STREAM_MGNT},
 			  {"c", integer_to_list(SeqNumber)}], []},
 
 		NextNumber = SeqNumber + 1,
@@ -1647,26 +1647,27 @@ get_conn_type(StateData) ->
     end.
 
 is_ack_packet({xmlelement, _Name, Attrs, _SubEls}) ->
-    xml:get_attr_s("xmlns", Attrs) == ?NS_ACK.
+    xml:get_attr_s("xmlns", Attrs) == ?NS_STREAM_MGNT.
 
 handle_ack_element({xmlelement, Name, Attrs, _SubEls}, StateData) ->
+    ?INFO_MSG("in handle_ack_element", []),
     case Name of
 	"ping" ->
 	    send_element(StateData,
 			 {xmlelement, "pong",
-			  [{"xmlns", ?NS_ACK}], []}),
+			  [{"xmlns", ?NS_STREAM_MGNT}], []}),
 	    StateData;
 	"enable" ->
 	    %% We don't support session restart for now
 	    send_element(StateData,
 			 {xmlelement, "enabled",
-			  [{"xmlns", ?NS_ACK}], []}),
+			  [{"xmlns", ?NS_STREAM_MGNT}], []}),
 	    StateData#state{ack_enabled = true};
 	"r" ->
 	    C = xml:get_attr_s("c", Attrs),
 	    send_element(StateData,
 			 {xmlelement, "a",
-			  [{"xmlns", ?NS_ACK},
+			  [{"xmlns", ?NS_STREAM_MGNT},
 			   {"b", C}],
 			  []}),
 	    ack_pending(xml:get_attr_s("b", Attrs), StateData);
