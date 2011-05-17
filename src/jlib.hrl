@@ -80,8 +80,10 @@
 -define(NS_FEATURE_IQREGISTER, "http://jabber.org/features/iq-register").
 -define(NS_FEATURE_COMPRESS, "http://jabber.org/features/compress").
 -define(NS_FEATURE_MSGOFFLINE, "msgoffline").
+-define(NS_FEATURE_ACK, "http://www.xmpp.org/extensions/xep-0198.html#ns").
 
 -define(NS_COMPRESS,     "http://jabber.org/protocol/compress").
+-define(NS_ACK,          "http://www.xmpp.org/extensions/xep-0198.html#ns").
 
 -define(NS_CAPS,          "http://jabber.org/protocol/caps").
 -define(NS_SHIM,          "http://jabber.org/protocol/shim").

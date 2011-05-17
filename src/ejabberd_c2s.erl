@@ -102,6 +102,10 @@
 		auth_module = unknown,
 		ip,
 		aux_fields = [],
+		ack_enabled = false,
+		%% ack_out_pending is a queue of {N, El}
+		ack_out_pending = queue:new(),
+		ack_out_next = 0,
 		lang}).
 
 %-define(DBGFSM, true).
@@ -388,7 +392,10 @@ wait_for_stream({xmlstreamstart, _Name, Attrs}, StateData) ->
 						[{xmlelement, "bind",
 						  [{"xmlns", ?NS_BIND}], []},
 						 {xmlelement, "session",
-						  [{"xmlns", ?NS_SESSION}], []}]
+						  [{"xmlns", ?NS_SESSION}], []},
+						 %% for reconnect, add elements here
+						 {xmlelement, "ack",
+						  [{"xmlns", ?NS_FEATURE_ACK}], []}]
 						++ RosterVersioningFeature
 						++ ejabberd_hooks:run_fold(
 						     c2s_stream_features,
@@ -820,8 +827,8 @@ wait_for_sasl_response(closed, StateData) ->
 
 
 wait_for_bind({xmlstreamelement, El}, StateData) ->
-    case jlib:iq_query_info(El) of
-	#iq{type = set, xmlns = ?NS_BIND, sub_el = SubEl} = IQ ->
+    case {jlib:iq_query_info(El), is_ack_packet(El)} of
+	{#iq{type = set, xmlns = ?NS_BIND, sub_el = SubEl} = IQ, _} ->
 	    U = StateData#state.user,
 	    R1 = xml:get_path_s(SubEl, [{elem, "resource"}, cdata]),
 	    R = case jlib:resourceprep(R1) of
@@ -857,6 +864,8 @@ wait_for_bind({xmlstreamelement, El}, StateData) ->
 		    fsm_next_state(wait_for_session,
 				   StateData#state{resource = R, jid = JID})
 	    end;
+	{_, true} ->
+	    fsm_next_state(wait_for_bind, handle_ack_element(El, StateData));
 	_ ->
 	    fsm_next_state(wait_for_bind, StateData)
     end;
@@ -879,8 +888,8 @@ wait_for_bind(closed, StateData) ->
 
 
 wait_for_session({xmlstreamelement, El}, StateData) ->
-    case jlib:iq_query_info(El) of
-	#iq{type = set, xmlns = ?NS_SESSION} ->
+    case {jlib:iq_query_info(El), is_ack_packet(El)} of
+	{#iq{type = set, xmlns = ?NS_SESSION}, _} ->
 	    U = StateData#state.user,
 	    R = StateData#state.resource,
 	    JID = StateData#state.jid,
@@ -931,6 +940,8 @@ wait_for_session({xmlstreamelement, El}, StateData) ->
 		    send_element(StateData, Err),
 		    fsm_next_state(wait_for_session, StateData)
 	    end;
+	{_, true} ->
+	    fsm_next_state(wait_for_session, handle_ack_element(El, StateData));
 	_ ->
 	    fsm_next_state(wait_for_session, StateData)
     end;
@@ -1015,8 +1026,10 @@ session_established2(El, StateData) ->
 		    NewEl1
 	    end,
     NewState =
-	case ToJID of
-	    error ->
+	case {ToJID, is_ack_packet(El)} of
+	    {_, true} ->
+		handle_ack_element(El, StateData);
+	    {error, _} ->
 		case xml:get_attr_s("type", Attrs) of
 		    "error" -> StateData;
 		    "result" -> StateData;
@@ -1344,12 +1357,12 @@ handle_info({route, From, To, Packet}, StateName, StateData) ->
 						jlib:jid_to_string(To),
 						NewAttrs),
 	    FixedPacket = {xmlelement, Name, Attrs2, Els},
-	    send_element(StateData, FixedPacket),
+	    NewState1 = send_element_ack(StateData, FixedPacket),
 	    ejabberd_hooks:run(user_receive_packet,
 			       StateData#state.server,
 			       [StateData#state.jid, From, To, FixedPacket]),
 	    ejabberd_hooks:run(c2s_loop_debug, [{route, From, To, Packet}]),
-	    fsm_next_state(StateName, NewState);
+	    fsm_next_state(StateName, NewState1);
 	true ->
 	    ejabberd_hooks:run(c2s_loop_debug, [{route, From, To, Packet}]),
 	    fsm_next_state(StateName, NewState)
@@ -1476,6 +1489,7 @@ terminate(_Reason, StateName, StateData) ->
 			      StateData, From, StateData#state.pres_i, Packet)
 		    end
 	    end,
+	    resend_unacked_stanzas(StateData),
 	    bounce_messages();
 	_ ->
 	    ok
@@ -1554,6 +1568,32 @@ send_trailer(StateData) when StateData#state.xml_socket ->
 send_trailer(StateData) ->
     send_text(StateData, ?STREAM_TRAILER).
 
+send_element_ack(StateData, El) ->
+    ElText = xml:element_to_string(El),
+    {AckText, NewState} =
+	case StateData#state.ack_enabled of
+	    false ->
+		{[], StateData};
+	    true ->
+		%% Here we send an ack request after each stanza.
+		%% That might not be the optimal way.
+
+		SeqNumber = StateData#state.ack_out_next,
+		%% We might want to include a 'b' attribute too,
+		%% if the client has unacked stanzas.
+		AckEl = {xmlelement, "r",
+			 [{"xmlns", ?NS_ACK},
+			  {"c", integer_to_list(SeqNumber)}], []},
+
+		NextNumber = SeqNumber + 1,
+		Pending = queue:in({SeqNumber, El}, StateData#state.ack_out_pending),
+		{xml:element_to_string(AckEl),
+		 StateData#state{ack_out_next = NextNumber,
+				 ack_out_pending = Pending}}
+	end,
+    send_text(NewState, [ElText, AckText]),
+    NewState.
+
 
 new_id() ->
     randoms:get_string().
@@ -1605,6 +1645,72 @@ get_conn_type(StateData) ->
     ejabberd_http_bind -> http_bind;
     _ -> unknown
     end.
+
+is_ack_packet({xmlelement, _Name, Attrs, _SubEls}) ->
+    xml:get_attr_s("xmlns", Attrs) == ?NS_ACK.
+
+handle_ack_element({xmlelement, Name, Attrs, _SubEls}, StateData) ->
+    case Name of
+	"ping" ->
+	    send_element(StateData,
+			 {xmlelement, "pong",
+			  [{"xmlns", ?NS_ACK}], []}),
+	    StateData;
+	"enable" ->
+	    %% We don't support session restart for now
+	    send_element(StateData,
+			 {xmlelement, "enabled",
+			  [{"xmlns", ?NS_ACK}], []}),
+	    StateData#state{ack_enabled = true};
+	"r" ->
+	    C = xml:get_attr_s("c", Attrs),
+	    send_element(StateData,
+			 {xmlelement, "a",
+			  [{"xmlns", ?NS_ACK},
+			   {"b", C}],
+			  []}),
+	    ack_pending(xml:get_attr_s("b", Attrs), StateData);
+	"a" ->
+	    ack_pending(xml:get_attr_s("b", Attrs), StateData)
+    end.
+
+resend_unacked_stanzas(StateData) ->
+    case StateData#state.ack_enabled of
+	false ->
+	    ok;
+	true ->
+	    %% Connection was terminated, and we have a few stanzas
+	    %% that were never acknowledged.  Try to route them again.
+	    lists:foreach(
+	      fun({_, {xmlelement, _Name, Attrs, _SubEls} = El}) ->
+		      From_s = xml:get_attr_s("from", Attrs),
+		      From = jlib:string_to_jid(From_s),
+		      To_s = xml:get_attr_s("to", Attrs),
+		      To = jlib:string_to_jid(To_s),
+		      ejabberd_router:route(From, To, El)
+	      end, queue:to_list(StateData#state.ack_out_pending))
+    end.
+
+ack_pending(BStr, StateData) ->
+    case BStr of
+	"" ->
+	    StateData;
+	_ ->
+	    B = list_to_integer(BStr),
+	    %% All stanzas numbered B or less have been successfully acked.
+	    Unacked = StateData#state.ack_out_pending,
+	    StateData#state{ack_out_pending = cut_below(B, Unacked)}
+    end.
+
+cut_below(B, Q) ->
+    %% Remove items from the head until the first item has sequence number > B
+    case queue:out(Q) of
+	{{value, {N, _El}}, Q1} when N =< B ->
+	    cut_below(B, Q1);
+	_ ->
+	    Q
+    end.
+
 
 process_presence_probe(From, To, StateData) ->
     LFrom = jlib:jid_tolower(From),
