@@ -42,7 +42,7 @@ typedef struct {
       XML_Parser parser;
 } expat_data;
 
-static XML_Memory_Handling_Suite ms = {driver_alloc, driver_realloc, driver_free};
+static XML_Memory_Handling_Suite ms;
 
 void encode_name(const XML_Char *name)
 {
@@ -132,6 +132,16 @@ void *erlXML_StartNamespaceDeclHandler(expat_data *d,
   int prefix_len;
   char *buf;
 
+  /* From the expat documentation:
+     "For a default namespace declaration (xmlns='...'),
+     the prefix will be null ...
+     ... The URI will be null for the case where
+     the default namespace is being unset."
+
+     FIXME: I'm not quite sure what all that means */
+  if (uri == NULL)
+      return NULL;
+
   ei_x_encode_list_header(&xmlns_buf, 1);
   ei_x_encode_tuple_header(&xmlns_buf, 2);
   if (prefix) {
@@ -168,6 +178,8 @@ static ErlDrvData expat_erl_start(ErlDrvPort port, char *buff)
    XML_SetStartNamespaceDeclHandler(
       d->parser, (XML_StartNamespaceDeclHandler) erlXML_StartNamespaceDeclHandler);
    XML_SetReturnNSTriplet(d->parser, 1);
+
+   XML_SetDefaultHandler(d->parser, NULL);
 
    return (ErlDrvData)d;
 }
@@ -244,6 +256,9 @@ ErlDrvEntry expat_driver_entry = {
 
 DRIVER_INIT(expat_erl) /* must match name in driver_entry */
 {
+    ms.malloc_fcn = driver_alloc;
+    ms.realloc_fcn = driver_realloc;
+    ms.free_fcn = driver_free;
     return &expat_driver_entry;
 }
 

@@ -66,6 +66,7 @@
 \newcommand{\module}[1]{\texttt{#1}}
 \newcommand{\modadhoc}{\module{mod\_adhoc}}
 \newcommand{\modannounce}{\module{mod\_announce}}
+\newcommand{\modblocking}{\module{mod\_blocking}}
 \newcommand{\modcaps}{\module{mod\_caps}}
 \newcommand{\modconfigure}{\module{mod\_configure}}
 \newcommand{\moddisco}{\module{mod\_disco}}
@@ -1475,7 +1476,7 @@ declarations of ACLs in the configuration file have the following syntax:
   with a name that matches \term{UserRegexp} at any server that matches
   \term{ServerRegexp}. Example:
 \begin{verbatim}
-{acl, yohzik, {node_regexp, "^yohzik$", "^example.(com|org)$"}}.
+{acl, yozhik, {node_regexp, "^yozhik$", "^example.(com|org)$"}}.
 \end{verbatim}
 \titem{\{user\_glob, Glob\}}
 \titem{\{user\_glob, Glob, Server\}}
@@ -2525,6 +2526,7 @@ The following table lists all modules included in \ejabberd{}.
     \hline
     \hline \modadhoc{} & Ad-Hoc Commands (\xepref{0050}) &  \\
     \hline \ahrefloc{modannounce}{\modannounce{}} & Manage announcements & recommends \modadhoc{} \\
+    \hline \modblocking{} & Simple Communications Blocking (\xepref{0191}) & \modprivacy{} \\
     \hline \modcaps{} &  Entity Capabilities (\xepref{0115}) & \\
     \hline \modconfigure{} & Server configuration using Ad-Hoc & \modadhoc{} \\
     \hline \ahrefloc{moddisco}{\moddisco{}} & Service Discovery (\xepref{0030}) &  \\
@@ -2540,8 +2542,8 @@ The following table lists all modules included in \ejabberd{}.
     \hline \ahrefloc{modoffline}{\modofflineodbc{}} & Offline message storage (\xepref{0160}) & supported DB (*) \\
     \hline \ahrefloc{modping}{\modping{}} & XMPP Ping and periodic keepalives (\xepref{0199}) &  \\
     \hline \ahrefloc{modprescounter}{\modprivacy{}} & Detect presence subscription flood &  \\
-    \hline \ahrefloc{modprivacy}{\modprivacy{}} & Blocking Communication (XMPP IM) &  \\
-    \hline \ahrefloc{modprivacy}{\modprivacyodbc{}} & Blocking Communication (XMPP IM) & supported DB (*) \\
+    \hline \ahrefloc{modprivacy}{\modprivacy{}} & Blocking Communication (\xepref{0016}) &  \\
+    \hline \ahrefloc{modprivacy}{\modprivacyodbc{}} & Blocking Communication (\xepref{0016}) & supported DB (*) \\
     \hline \ahrefloc{modprivate}{\modprivate{}} & Private XML Storage (\xepref{0049}) &  \\
     \hline \ahrefloc{modprivate}{\modprivateodbc{}} & Private XML Storage (\xepref{0049}) & supported DB (*) \\
     \hline \ahrefloc{modproxy}{\modproxy{}} & SOCKS5 Bytestreams (\xepref{0065}) &  \\
@@ -3050,7 +3052,7 @@ End user information:
   to join a channel, and to set custom IRC username and encoding.
 \item When using a popular \XMPP{} server, it can occur that no
   connection can be achieved with some IRC servers because they limit the
-  number of conections from one IP.
+  number of connections from one IP.
 \end{itemize}
 
 Options:
@@ -3949,6 +3951,8 @@ Options:
 
 This example configuration shows how to enable the module and the web handler:
 \begin{verbatim}
+{hosts, ["localhost", "example.org", "example.com"]}.
+
 {listen, [
   ...
   {5281, ejabberd_http, [
@@ -3967,7 +3971,8 @@ This example configuration shows how to enable the module and the web handler:
  ]}.
 \end{verbatim}
 
-The users can visit this page: https://localhost:5281/register/
+For example, the users of the host \term{example.org} can visit the page:
+\ns{https://example.org:5281/register/}
 It is important to include the last / character in the URL,
 otherwise the subpages URL will be incorrect.
 
@@ -4626,7 +4631,7 @@ Examples:
 \makesubsection{modvcardldap}{\modvcardldap{}}
 \ind{modules!\modvcardldap{}}\ind{JUD}\ind{Jabber User Directory}\ind{vCard}\ind{protocols!XEP-0054: vcard-temp}
 
-%TODO: verify if the referers to the LDAP section are still correct
+%TODO: verify if the referrers to the LDAP section are still correct
 
 \ejabberd{} can map LDAP attributes to vCard fields. This behaviour is
 implemented in the \modvcardldap{} module. This module does not depend on the
@@ -4978,6 +4983,8 @@ The environment variables:
 	This path is used to read the file \term{.erlang.cookie}.
   \titem{ERL\_CRASH\_DUMP}
 	Path to the file where crash reports will be dumped.
+  \titem{ERL\_EPMD\_ADDRESS}
+	IP address where epmd listens for connections (see section \ref{epmd}).
   \titem{ERL\_INETRC}
 	Indicates which IP name resolution to use.
 	If using \term{-sname}, specify either this option or \term{-kernel inetrc filepath}.
@@ -5006,10 +5013,10 @@ The command line parameters:
         connections (see section \ref{epmd}).
   \titem{-detached}
         Starts the Erlang system detached from the system console.
-	Useful for running daemons and backgrounds processes.
+	Useful for running daemons and background processes.
   \titem{-noinput}
 	Ensures that the Erlang system never tries to read any input.
-	Useful for running daemons and backgrounds processes.
+	Useful for running daemons and background processes.
   \titem{-pa /var/lib/ejabberd/ebin}
 	Specify the directory where Erlang binary files (*.beam) are located.
   \titem{-s ejabberd}
@@ -5399,6 +5406,8 @@ In order for this communication to work,
 \term{epmd} must be running and listening for name requests in the port 4369.
 You should block the port 4369 in the firewall in such a way that
 only the programs in your machine can access it.
+or configure the option \term{ERL\_EPMD\_ADDRESS} in the file \term{ejabberdctl.cfg}
+(this option works only in Erlang/OTP R14B03 or higher).
 
 If you build a cluster of several \ejabberd{} instances,
 each \ejabberd{} instance is called an \ejabberd{} node.
@@ -5805,10 +5814,6 @@ The Web Admin also supports the \verb|Accept-Language| HTTP header.
   \label{fig:webadmmainru}
 \end{figure}
 
-
-%\section{Ultra Complex Example}
-%\label{ultracomplexexample}
-%TODO: a very big example covering the whole guide, with a good explanation before the example: different authenticaton mechanisms, transports, ACLs, multple virtual hosts, virtual host specific settings and general settings, modules,...
 
 \makechapter{releasenotes}{Release Notes}
 \ind{release notes}
