@@ -5,7 +5,7 @@
 %%% Created : 12 Mar 2006 by Alexey Shchepin <alexey@process-one.net>
 %%%
 %%%
-%%% ejabberd, Copyright (C) 2002-2011   ProcessOne
+%%% ejabberd, Copyright (C) 2002-2013   ProcessOne
 %%%
 %%% This program is free software; you can redistribute it and/or
 %%% modify it under the terms of the GNU General Public License as
@@ -52,12 +52,16 @@
 -define(PROCNAME, ejabberd_mod_muc_log).
 -record(room, {jid, title, subject, subject_author, config}).
 
+-define(PLAINTEXT_CO, "ZZCZZ").
+-define(PLAINTEXT_IN, "ZZIZZ").
+-define(PLAINTEXT_OUT, "ZZOZZ").
 
 -record(logstate, {host,
 		out_dir,
 		dir_type,
 		dir_name,
 		file_format,
+		file_permissions,
 		css_file,
 		access,
 		lang,
@@ -121,6 +125,7 @@ init([Host, Opts]) ->
     DirType = gen_mod:get_opt(dirtype, Opts, subdirs),
     DirName = gen_mod:get_opt(dirname, Opts, room_jid),
     FileFormat = gen_mod:get_opt(file_format, Opts, html), % Allowed values: html|plaintext
+    FilePermissions = gen_mod:get_opt(file_permissions, Opts, {644, 33}),
     CSSFile = gen_mod:get_opt(cssfile, Opts, false),
     AccessLog = gen_mod:get_opt(access_log, Opts, muc_admin),
     Timezone = gen_mod:get_opt(timezone, Opts, local),
@@ -139,6 +144,7 @@ init([Host, Opts]) ->
 		dir_type = DirType,
 		dir_name = DirName,
 		file_format = FileFormat,
+		file_permissions = FilePermissions,
 		css_file = CSSFile,
 		access = AccessLog,
 		lang = Lang,
@@ -311,11 +317,27 @@ write_last_lines(F, Images_dir, _FileFormat) ->
     fw(F, "  <a href=\"http://jigsaw.w3.org/css-validator/\"><img style=\"border:0;width:88px;height:31px\" src=\"~s/vcss.png\" alt=\"Valid CSS!\"/></a>", [Images_dir]),
     fw(F, "</span></div></body></html>").
 
+htmlize_nick(Nick1, html) ->
+    htmlize("<"++Nick1++">", html);
+htmlize_nick(Nick1, plaintext) ->
+    htmlize(?PLAINTEXT_IN++Nick1++?PLAINTEXT_OUT, plaintext).
+
+%% list_to_integer/2 was introduced in OTP R14
+-ifdef(SSL40).
+set_filemode(Fn, {FileMode, FileGroup}) ->
+    ok = file:change_mode(Fn, list_to_integer(integer_to_list(FileMode), 8)),
+    ok = file:change_group(Fn, FileGroup).
+-else.
+set_filemode(Fn, {_FileMode, FileGroup}) ->
+    ok = file:change_group(Fn, FileGroup).
+-endif.
+
 add_message_to_log(Nick1, Message, RoomJID, Opts, State) ->
     #logstate{out_dir = OutDir,
 	   dir_type = DirType,
 	   dir_name = DirName,
 	   file_format = FileFormat,
+	   file_permissions = FilePermissions,
 	   css_file = CSSFile,
 	   lang = Lang,
 	   timezone = Timezone,
@@ -323,7 +345,7 @@ add_message_to_log(Nick1, Message, RoomJID, Opts, State) ->
 	   top_link = TopLink} = State,
     Room = get_room_info(RoomJID, Opts),
     Nick = htmlize(Nick1, FileFormat),
-    Nick2 = htmlize("<"++Nick1++">", FileFormat),
+    Nick2 = htmlize_nick(Nick1, FileFormat),
     Now = now(),
     TimeStamp = case Timezone of
 		    local -> calendar:now_to_local_time(Now);
@@ -339,6 +361,8 @@ add_message_to_log(Nick1, Message, RoomJID, Opts, State) ->
 	{error, enoent} ->
 	    make_dir_rec(Fd),
 	    {ok, F} = file:open(Fn, [append]),
+	    catch set_filemode(Fn, FilePermissions),
+
 	    Datestring = get_dateweek(Date, Lang),
 
 	    TimeStampYesterday = get_timestamp_daydiff(TimeStamp, -1),
@@ -416,11 +440,11 @@ add_message_to_log(Nick1, Message, RoomJID, Opts, State) ->
 		   io_lib:format("<font class=\"msc\">~s~s~s</font><br/>", 
 				 [Nick, ?T(" has set the subject to: "), htmlize(T,NoFollow,FileFormat)]);
 	       {body, T} ->  
-		   case {regexp:first_match(T, "^/me\s"), Nick} of
+		   case {ejabberd_regexp:run(T, "^/me\s"), Nick} of
 		       {_, ""} ->
 			   io_lib:format("<font class=\"msm\">~s</font><br/>",
 					 [htmlize(T,NoFollow,FileFormat)]);
-		       {{match, _, _}, _} ->
+		       {match, _} ->
 			   io_lib:format("<font class=\"mne\">~s ~s</font><br/>", 
 					 [Nick, string:substr(htmlize(T,FileFormat), 5)]);
 		       {nomatch, _} ->
@@ -438,7 +462,7 @@ add_message_to_log(Nick1, Message, RoomJID, Opts, State) ->
     STimeUnique = io_lib:format("~s.~w", [STime, Microsecs]),
 
     %% Write message
-    fw(F, io_lib:format("<a id=\"~s\" name=\"~s\" href=\"#~s\" class=\"ts\">[~s]</a> ", 
+    catch fw(F, io_lib:format("<a id=\"~s\" name=\"~s\" href=\"#~s\" class=\"ts\">[~s]</a> ",
 			[STimeUnique, STimeUnique, STimeUnique, STime]) ++ Text, FileFormat),
 
     %% Close file
@@ -492,8 +516,9 @@ make_dir_rec(Dir) ->
 	{error, enoent} ->
 	    DirS = filename:split(Dir),
 	    DirR = lists:sublist(DirS, length(DirS)-1),
-	    make_dir_rec(filename:join(DirR)),
-	    file:make_dir(Dir)
+	    ok = make_dir_rec(filename:join(DirR)),
+	    ok = file:make_dir(Dir),
+	    ok = file:change_mode(Dir, 8#00755) % -rwxr-xr-x
     end.
 
 
@@ -662,8 +687,10 @@ fw(F, S, O, FileFormat) ->
 	     html ->
 		 S1;
 	     plaintext ->
-		 {ok, Res, _} = regexp:gsub(S1, "<[^>]*>", ""),
-		 Res
+		 S1a = ejabberd_regexp:greplace(S1, "<[^<^>]*>", ""),
+		 S1x = ejabberd_regexp:greplace(S1a, ?PLAINTEXT_CO, "~~"),
+		 S1y = ejabberd_regexp:greplace(S1x, ?PLAINTEXT_IN, "<"),
+		 ejabberd_regexp:greplace(S1y, ?PLAINTEXT_OUT, ">")
 	 end,
     io:format(F, S2, []).
 
@@ -768,14 +795,16 @@ htmlize(S1) ->
     htmlize(S1, html).
 
 htmlize(S1, plaintext) ->
-    S1;
+    ejabberd_regexp:greplace(S1, "~", ?PLAINTEXT_CO);
 htmlize(S1, FileFormat) ->
     htmlize(S1, false, FileFormat).
 
 %% The NoFollow parameter tell if the spam prevention should be applied to the link found
 %% true means 'apply nofollow on links'.
-htmlize(S1, _NoFollow, plaintext) ->
-    S1;
+htmlize(S0, _NoFollow, plaintext) ->
+    S1  = ejabberd_regexp:greplace(S0, "~", ?PLAINTEXT_CO),
+    S1x = ejabberd_regexp:greplace(S1, "<", ?PLAINTEXT_IN),
+    ejabberd_regexp:greplace(S1x, ">", ?PLAINTEXT_OUT);
 htmlize(S1, NoFollow, _FileFormat) ->
     S2_list = string:tokens(S1, "\n"),
     lists:foldl(
@@ -790,15 +819,15 @@ htmlize(S1, NoFollow, _FileFormat) ->
       S2_list).
 
 htmlize2(S1, NoFollow) ->
-    S2 = element(2, regexp:gsub(S1, "\\&", "\\&amp;")),
-    S3 = element(2, regexp:gsub(S2, "<", "\\&lt;")),
-    S4 = element(2, regexp:gsub(S3, ">", "\\&gt;")),
-    S5 = element(2, regexp:gsub(S4, "((http|https|ftp)://|(mailto|xmpp):)[^] )\'\"}]+",
-				link_regexp(NoFollow))),
+    S2 = ejabberd_regexp:greplace(S1, "\\&", "\\&amp;"),
+    S3 = ejabberd_regexp:greplace(S2, "<", "\\&lt;"),
+    S4 = ejabberd_regexp:greplace(S3, ">", "\\&gt;"),
+    S5 = ejabberd_regexp:greplace(S4, "((http|https|ftp)://|(mailto|xmpp):)[^] )\'\"}]+",
+				link_regexp(NoFollow)),
     %% Remove 'right-to-left override' unicode character 0x202e
-    S6 = element(2, regexp:gsub(S5, "  ", "\\&nbsp;\\&nbsp;")),
-    S7 = element(2, regexp:gsub(S6, "\\t", "\\&nbsp;\\&nbsp;\\&nbsp;\\&nbsp;")),
-    element(2, regexp:gsub(S7, [226,128,174], "[RLO]")).
+    S6 = ejabberd_regexp:greplace(S5, "  ", "\\&nbsp;\\&nbsp;"),
+    S7 = ejabberd_regexp:greplace(S6, "\\t", "\\&nbsp;\\&nbsp;\\&nbsp;\\&nbsp;"),
+    ejabberd_regexp:greplace(S7, [226,128,174], "[RLO]").
 
 %% Regexp link
 %% Add the nofollow rel attribute when required
@@ -863,6 +892,7 @@ roomconfig_to_string(Options, Lang, FileFormat) ->
 				       max_users -> "<div class=\"rcot\">" ++ OptText ++ ": \"" ++ htmlize(integer_to_list(T), FileFormat) ++ "\"</div>";
 				       title -> "<div class=\"rcot\">" ++ OptText ++ ": \"" ++ htmlize(T, FileFormat) ++ "\"</div>";
 				       description -> "<div class=\"rcot\">" ++ OptText ++ ": \"" ++ htmlize(T, FileFormat) ++ "\"</div>";
+				       allow_private_messages_from_visitors -> "<div class=\"rcot\">" ++ OptText ++ ": \"" ++ htmlize(?T(atom_to_list(T)), FileFormat) ++ "\"</div>";
 				       _ -> "\"" ++ T ++ "\""
 				   end
 			   end,
@@ -884,6 +914,7 @@ get_roomconfig_text(moderated) -> "Make room moderated";
 get_roomconfig_text(members_by_default) -> "Default users as participants";
 get_roomconfig_text(allow_change_subj) -> "Allow users to change the subject";
 get_roomconfig_text(allow_private_messages) -> "Allow users to send private messages";
+get_roomconfig_text(allow_private_messages_from_visitors) -> "Allow visitors to send private messages to";
 get_roomconfig_text(allow_query_users) -> "Allow users to query other users";
 get_roomconfig_text(allow_user_invites) -> "Allow users to send invites";
 get_roomconfig_text(logging) ->  "Enable logging";
@@ -943,7 +974,7 @@ get_room_state(RoomName, MucService) ->
 	    RoomPid = R#muc_online_room.pid,
 	    get_room_state(RoomPid);
 	[] ->
-	    room_not_found
+	    #state{}
     end.
 
 get_room_state(RoomPid) ->

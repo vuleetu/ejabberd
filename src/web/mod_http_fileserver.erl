@@ -5,7 +5,7 @@
 %%% Created :
 %%%
 %%%
-%%% ejabberd, Copyright (C) 2002-2011   ProcessOne
+%%% ejabberd, Copyright (C) 2002-2013   ProcessOne
 %%%
 %%% This program is free software; you can redistribute it and/or
 %%% modify it under the terms of the GNU General Public License as
@@ -91,9 +91,10 @@
                                 {".html", "text/html"},
                                 {".jar",  "application/java-archive"},
                                 {".jpeg", "image/jpeg"},
-				{".jpg",  "image/jpeg"},
+                                {".jpg",  "image/jpeg"},
                                 {".js",   "text/javascript"},
                                 {".png",  "image/png"},
+                                {".svg",  "image/svg+xml"},
                                 {".txt",  "text/plain"},
                                 {".xml",  "application/xml"},
                                 {".xpi",  "application/x-xpinstall"},
@@ -302,7 +303,7 @@ process(LocalPath, Request) ->
 	    add_to_log(FileSize, Code, Request),
 	    {Code, Headers, Contents}
     catch
-	exit:{noproc, _} -> 
+	exit:{noproc, _} ->
 	    ?ERROR_MSG("Received an HTTP request with Host ~p, but couldn't find the related "
 		       "ejabberd virtual host", [Request#request.host]),
 	    ejabberd_web:error(not_found)
@@ -312,6 +313,7 @@ serve(LocalPath, DocRoot, DirectoryIndices, CustomHeaders, DefaultContentType, C
     FileName = filename:join(filename:split(DocRoot) ++ LocalPath),
     case file:read_file_info(FileName) of
         {error, enoent}                    -> ?HTTP_ERR_FILE_NOT_FOUND;
+        {error, enotdir}                   -> ?HTTP_ERR_FILE_NOT_FOUND;
         {error, eacces}                    -> ?HTTP_ERR_FORBIDDEN;
         {ok, #file_info{type = directory}} -> serve_index(FileName,
                                                           DirectoryIndices,

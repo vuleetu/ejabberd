@@ -5,7 +5,7 @@
 %%% Created : 12 Oct 2006 by Mickael Remond <mremond@process-one.net>
 %%%
 %%%
-%%% ejabberd, Copyright (C) 2002-2011   ProcessOne
+%%% ejabberd, Copyright (C) 2002-2013   ProcessOne
 %%%
 %%% This program is free software; you can redistribute it and/or
 %%% modify it under the terms of the GNU General Public License as
@@ -94,17 +94,18 @@ get_user_part(String, Pattern) ->
 	{'EXIT', _} ->
 	    {error, badmatch};
 	Result ->
-	    case regexp:sub(Pattern, "%u", Result) of
-		{ok, StringRes, _} ->
+            case catch ejabberd_regexp:replace(Pattern, "%u", Result) of
+                {'EXIT', _} ->
+                    {error, badmatch};
+		StringRes ->
                     case (string:to_lower(StringRes) ==
                               string:to_lower(String)) of
                         true ->
                             {ok, Result};
                         false ->
                             {error, badmatch}
-                    end;
-		_ -> {error, badmatch}
-	    end
+                    end
+            end
     end.
 
 make_filter(Data, UIDs) ->

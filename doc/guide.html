@@ -6,7 +6,7 @@
  
  
 
- ejabberd 2.1.7 
+ ejabberd 2.1.13 
  
  Installation and Operation Guide
  
@@ -76,7 +76,7 @@ BLOCKQUOTE.figure DIV.center DIV.center HR{display:none;}
 <HR SIZE=2><BR>
 <BR>
 
-<TABLE CELLSPACING=6 CELLPADDING=0><TR><TD ALIGN=right NOWRAP> <FONT SIZE=6><B>ejabberd 2.1.7 </B></FONT></TD></TR>
+<TABLE CELLSPACING=6 CELLPADDING=0><TR><TD ALIGN=right NOWRAP> <FONT SIZE=6><B>ejabberd 2.1.13 </B></FONT></TD></TR>
 <TR><TD ALIGN=right NOWRAP>&nbsp;</TD></TR>
 <TR><TD ALIGN=right NOWRAP> <FONT SIZE=6>Installation and Operation Guide</FONT></TD></TR>
 </TABLE><BR>
@@ -109,7 +109,7 @@ BLOCKQUOTE.figure DIV.center DIV.center HR{display:none;}
 </LI><LI CLASS="li-toc"><A HREF="#htoc15">2.4.7&#XA0;&#XA0;Specific Notes for Sun Solaris</A>
 </LI><LI CLASS="li-toc"><A HREF="#htoc16">2.4.8&#XA0;&#XA0;Specific Notes for Microsoft Windows</A>
 </LI></UL>
-</LI><LI CLASS="li-toc"><A HREF="#htoc17">2.5&#XA0;&#XA0;Create a XMPP Account for Administration</A>
+</LI><LI CLASS="li-toc"><A HREF="#htoc17">2.5&#XA0;&#XA0;Create an XMPP Account for Administration</A>
 </LI><LI CLASS="li-toc"><A HREF="#htoc18">2.6&#XA0;&#XA0;Upgrading <TT>ejabberd</TT></A>
 </LI></UL>
 </LI><LI CLASS="li-toc"><A HREF="#htoc19">Chapter&#XA0;3&#XA0;&#XA0;Configuring <TT>ejabberd</TT></A>
@@ -207,21 +207,20 @@ BLOCKQUOTE.figure DIV.center DIV.center HR{display:none;}
 </LI><LI CLASS="li-toc"><A HREF="#htoc92">6.2&#XA0;&#XA0;Clustering Setup</A>
 </LI><LI CLASS="li-toc"><A HREF="#htoc93">6.3&#XA0;&#XA0;Service Load-Balancing</A>
 <UL CLASS="toc"><LI CLASS="li-toc">
-<A HREF="#htoc94">6.3.1&#XA0;&#XA0;Components Load-Balancing</A>
-</LI><LI CLASS="li-toc"><A HREF="#htoc95">6.3.2&#XA0;&#XA0;Domain Load-Balancing Algorithm</A>
-</LI><LI CLASS="li-toc"><A HREF="#htoc96">6.3.3&#XA0;&#XA0;Load-Balancing Buckets</A>
+<A HREF="#htoc94">6.3.1&#XA0;&#XA0;Domain Load-Balancing Algorithm</A>
+</LI><LI CLASS="li-toc"><A HREF="#htoc95">6.3.2&#XA0;&#XA0;Load-Balancing Buckets</A>
 </LI></UL>
 </LI></UL>
-</LI><LI CLASS="li-toc"><A HREF="#htoc97">Chapter&#XA0;7&#XA0;&#XA0;Debugging</A>
+</LI><LI CLASS="li-toc"><A HREF="#htoc96">Chapter&#XA0;7&#XA0;&#XA0;Debugging</A>
 <UL CLASS="toc"><LI CLASS="li-toc">
-<A HREF="#htoc98">7.1&#XA0;&#XA0;Log Files</A>
-</LI><LI CLASS="li-toc"><A HREF="#htoc99">7.2&#XA0;&#XA0;Debug Console</A>
-</LI><LI CLASS="li-toc"><A HREF="#htoc100">7.3&#XA0;&#XA0;Watchdog Alerts</A>
+<A HREF="#htoc97">7.1&#XA0;&#XA0;Log Files</A>
+</LI><LI CLASS="li-toc"><A HREF="#htoc98">7.2&#XA0;&#XA0;Debug Console</A>
+</LI><LI CLASS="li-toc"><A HREF="#htoc99">7.3&#XA0;&#XA0;Watchdog Alerts</A>
 </LI></UL>
-</LI><LI CLASS="li-toc"><A HREF="#htoc101">Appendix&#XA0;A&#XA0;&#XA0;Internationalization and Localization</A>
-</LI><LI CLASS="li-toc"><A HREF="#htoc102">Appendix&#XA0;B&#XA0;&#XA0;Release Notes</A>
-</LI><LI CLASS="li-toc"><A HREF="#htoc103">Appendix&#XA0;C&#XA0;&#XA0;Acknowledgements</A>
-</LI><LI CLASS="li-toc"><A HREF="#htoc104">Appendix&#XA0;D&#XA0;&#XA0;Copyright Information</A>
+</LI><LI CLASS="li-toc"><A HREF="#htoc100">Appendix&#XA0;A&#XA0;&#XA0;Internationalization and Localization</A>
+</LI><LI CLASS="li-toc"><A HREF="#htoc101">Appendix&#XA0;B&#XA0;&#XA0;Release Notes</A>
+</LI><LI CLASS="li-toc"><A HREF="#htoc102">Appendix&#XA0;C&#XA0;&#XA0;Acknowledgements</A>
+</LI><LI CLASS="li-toc"><A HREF="#htoc103">Appendix&#XA0;D&#XA0;&#XA0;Copyright Information</A>
 </LI></UL><!--TOC chapter Introduction-->
 <H1 CLASS="chapter"><!--SEC ANCHOR --><A NAME="htoc1">Chapter&#XA0;1</A>&#XA0;&#XA0;Introduction</H1><!--SEC END --><P>
 <A NAME="intro"></A></P><P><TT>ejabberd</TT> is a free and open source instant messaging server written in <A HREF="http://www.erlang.org/">Erlang/OTP</A>.</P><P><TT>ejabberd</TT> is cross-platform, distributed, fault-tolerant, and based on open standards to achieve real-time communication.</P><P><TT>ejabberd</TT> is designed to be a rock-solid and feature rich XMPP server.</P><P><TT>ejabberd</TT> is suitable for small deployments, whether they need to be scalable or not, as well as extremely big deployments.</P><!--TOC section Key Features-->
@@ -306,8 +305,9 @@ Note that the Windows service is a feature still in development,
 and for example it doesn&#X2019;t read the file ejabberdctl.cfg.</P><P>On a *nix system, if you want ejabberd to be started as daemon at boot time,
 copy <TT>ejabberd.init</TT> from the &#X2019;bin&#X2019; directory to something like <TT>/etc/init.d/ejabberd</TT>
 (depending on your distribution).
-Create a system user called <TT>ejabberd</TT>;
-it will be used by the script to start the server.
+Create a system user called <TT>ejabberd</TT>,
+give it write access to the directories <TT>database/</TT> and <TT>logs/</TT>, and set that as home;
+the script will start the server with that user.
 Then you can call <TT>/etc/inid.d/ejabberd start</TT> as root to start the server.</P><P>If <TT>ejabberd</TT> doesn&#X2019;t start correctly in Windows,
 try to start it using the shortcut in desktop or start menu.
 If the window shows error 14001, the solution is to install:
@@ -348,7 +348,7 @@ as long as your system have all the dependencies.</P><P> <A NAME="installreq"></
 GNU Make
 </LI><LI CLASS="li-itemize">GCC
 </LI><LI CLASS="li-itemize">Libexpat 1.95 or higher
-</LI><LI CLASS="li-itemize">Erlang/OTP R10B-9 or higher. The recommended versions are R12B-5 and R13B04.
+</LI><LI CLASS="li-itemize">Erlang/OTP R10B-9 or higher. The recommended versions are R13B04 and R14B04.
 Don&#X2019;t use R14A or R14B because <A HREF="http://www.erlang.org/cgi-bin/ezmlm-cgi/4/54598">they have a bug</A>.
 </LI><LI CLASS="li-itemize">OpenSSL 0.9.8 or higher, for STARTTLS, SASL and SSL encryption.
 </LI><LI CLASS="li-itemize">Zlib 1.2.3 or higher, for Stream Compression support (<A HREF="http://xmpp.org/extensions/xep-0138.html">XEP-0138</A>). Optional.
@@ -513,20 +513,20 @@ variable.
 nmake -f Makefile.win32
 </PRE></LI><LI CLASS="li-enumerate">Edit the file <CODE>ejabberd\src\ejabberd.cfg</CODE> and run
 <PRE CLASS="verbatim">werl -s ejabberd -name ejabberd
-</PRE></LI></OL><P> <A NAME="initialadmin"></A> </P><!--TOC section Create a XMPP Account for Administration-->
-<H2 CLASS="section"><!--SEC ANCHOR --><A NAME="htoc17">2.5</A>&#XA0;&#XA0;<A HREF="#initialadmin">Create a XMPP Account for Administration</A></H2><!--SEC END --><P> <A NAME="initialadmin"></A> </P><P>You need a XMPP account and grant him administrative privileges
+</PRE></LI></OL><P> <A NAME="initialadmin"></A> </P><!--TOC section Create an XMPP Account for Administration-->
+<H2 CLASS="section"><!--SEC ANCHOR --><A NAME="htoc17">2.5</A>&#XA0;&#XA0;<A HREF="#initialadmin">Create an XMPP Account for Administration</A></H2><!--SEC END --><P> <A NAME="initialadmin"></A> </P><P>You need an XMPP account and grant him administrative privileges
 to enter the <TT>ejabberd</TT> Web Admin:
 </P><OL CLASS="enumerate" type=1><LI CLASS="li-enumerate">
-Register a XMPP account on your <TT>ejabberd</TT> server, for example <TT>admin1@example.org</TT>.
-There are two ways to register a XMPP account:
+Register an XMPP account on your <TT>ejabberd</TT> server, for example <TT>admin1@example.org</TT>.
+There are two ways to register an XMPP account:
 <OL CLASS="enumerate" type=a><LI CLASS="li-enumerate">
 Using <TT>ejabberdctl</TT> (see section&#XA0;<A HREF="#ejabberdctl">4.1</A>):
 <PRE CLASS="verbatim">ejabberdctl register admin1 example.org FgT5bk3
-</PRE></LI><LI CLASS="li-enumerate">Using a XMPP client and In-Band Registration (see section&#XA0;<A HREF="#modregister">3.3.19</A>).
+</PRE></LI><LI CLASS="li-enumerate">Using an XMPP client and In-Band Registration (see section&#XA0;<A HREF="#modregister">3.3.19</A>).
 </LI></OL>
 </LI><LI CLASS="li-enumerate">Edit the <TT>ejabberd</TT> configuration file to give administration rights to the XMPP account you created:
-<PRE CLASS="verbatim">{acl, admins, {user, "admin1", "example.org"}}.
-{access, configure, [{allow, admins}]}.
+<PRE CLASS="verbatim">{acl, admin, {user, "admin1", "example.org"}}.
+{access, configure, [{allow, admin}]}.
 </PRE>You can grant administrative privileges to many XMPP accounts,
 and also to accounts in other XMPP servers.
 </LI><LI CLASS="li-enumerate">Restart <TT>ejabberd</TT> to load the new configuration.
@@ -688,14 +688,14 @@ Handles incoming s2s connections.<BR>
 Interacts with an <A HREF="http://www.ejabberd.im/tutorials-transports">external component</A>
 (as defined in the Jabber Component Protocol (<A HREF="http://xmpp.org/extensions/xep-0114.html">XEP-0114</A>).<BR>
  Options: <TT>access</TT>, <TT>hosts</TT>, <TT>max_fsm_queue</TT>,
-<TT>service_check_from</TT>, <TT>shaper</TT>
+<TT>service_check_from</TT>, <TT>shaper_rule</TT>
 </DD><DT CLASS="dt-description"><B><TT>ejabberd_stun</TT></B></DT><DD CLASS="dd-description">
 Handles STUN Binding requests as defined in
 <A HREF="http://tools.ietf.org/html/rfc5389">RFC 5389</A>.<BR>
  Options: <TT>certfile</TT>
 </DD><DT CLASS="dt-description"><B><TT>ejabberd_http</TT></B></DT><DD CLASS="dd-description">
 Handles incoming HTTP connections.<BR>
- Options: <TT>captcha</TT>, <TT>certfile</TT>, <TT>http_bind</TT>, <TT>http_poll</TT>,
+ Options: <TT>captcha</TT>, <TT>certfile</TT>, <TT>default_host</TT>, <TT>http_bind</TT>, <TT>http_poll</TT>,
 <TT>request_handlers</TT>, <TT>tls</TT>, <TT>trusted_proxies</TT>, <TT>web_admin</TT><BR>
 </DD></DL><P> <A NAME="listened-options"></A> </P><!--TOC subsubsection Options-->
 <H4 CLASS="subsubsection"><!--SEC ANCHOR --><A HREF="#listened-options">Options</A></H4><!--SEC END --><P> <A NAME="listened-options"></A> </P><P>This is a detailed description of each option allowed by the listening modules:
@@ -712,6 +712,11 @@ immediately). Default value is 5.
 Simple web page that allows a user to fill a CAPTCHA challenge (see section <A HREF="#captcha">3.1.8</A>).
 </DD><DT CLASS="dt-description"><B><TT>{certfile, Path}</TT></B></DT><DD CLASS="dd-description"> Full path to a file containing the default SSL certificate.
 To define a certificate file specific for a given domain, use the global option <TT>domain_certfile</TT>.
+</DD><DT CLASS="dt-description"><B><TT>{default_host, undefined|HostName}</TT></B></DT><DD CLASS="dd-description">
+If the HTTP request received by ejabberd contains the HTTP header <TT>Host</TT>
+with an ambiguous virtual host that doesn&#X2019;t match any one defined in ejabberd (see <A HREF="#hostnames">3.1.1</A>),
+then this configured HostName is set as the request Host.
+The default value of this option is: <TT>undefined</TT>.
 </DD><DT CLASS="dt-description"><B><TT>{hosts, [Hostname, ...], [HostOption, ...]}</TT></B></DT><DD CLASS="dd-description"> 
 The external Jabber component that connects to this <TT>ejabberd_service</TT>
 can serve one or more hostnames.
@@ -787,6 +792,9 @@ The default value is <TT>true</TT>, to be compliant with <A HREF="http://xmpp.or
 </DD><DT CLASS="dt-description"><B><TT>{shaper, none|ShaperName}</TT></B></DT><DD CLASS="dd-description"> This option defines a
 shaper for the port (see section&#XA0;<A HREF="#shapers">3.1.6</A>). The default value
 is <TT>none</TT>.
+</DD><DT CLASS="dt-description"><B><TT>{shaper_rule, none|ShaperRule}</TT></B></DT><DD CLASS="dd-description"> This option defines a
+shaper rule for the <TT>ejabberd_service</TT> (see section&#XA0;<A HREF="#shapers">3.1.6</A>). The recommended value
+is <TT>fast</TT>.
 </DD><DT CLASS="dt-description"><B><TT>starttls</TT></B></DT><DD CLASS="dd-description"> This option
 specifies that STARTTLS encryption is available on connections to the port.
 You should also set the <TT>certfile</TT> option.
@@ -1051,17 +1059,44 @@ internal (default) &#X2014; See section&#XA0;<A HREF="#internalauth">3.1.4</A>.
 <A HREF="#mssql">3.2.2</A> and <A HREF="#odbc">3.2.4</A>.
 </LI><LI CLASS="li-itemize">anonymous &#X2014; See section&#XA0;<A HREF="#saslanonymous">3.1.4</A>.
 </LI><LI CLASS="li-itemize">pam &#X2014; See section&#XA0;<A HREF="#pam">3.1.4</A>.
-</LI></UL><P>Account creation is only supported by internal, external and odbc methods.</P><P> <A NAME="internalauth"></A> </P><!--TOC subsubsection Internal-->
+</LI></UL><P>Account creation is only supported by internal, external and odbc methods.</P><P>The option <TT>resource_conflict</TT> defines the action when a client attempts to
+login to an account with a resource that is already connected.
+The option syntax is:
+</P><DL CLASS="description"><DT CLASS="dt-description"><B><TT>{resource_conflict, setresource|closenew|closeold}.</TT></B></DT></DL><P>
+The possible values match exactly the three possibilities described in
+<A HREF="http://tools.ietf.org/html/rfc6120#section-7.7.2.2">XMPP Core: section 7.7.2.2</A>.
+The default value is <TT>closeold</TT>.
+If the client uses old Jabber Non-SASL authentication (<A HREF="http://xmpp.org/extensions/xep-0078.html">XEP-0078</A>),
+then this option is not respected, and the action performed is <TT>closeold</TT>.</P><P>The option <TT>fqdn</TT> allows you to define the Fully Qualified Domain Name
+of the machine, in case it isn&#X2019;t detected automatically.
+The FQDN is used to authenticate some clients that use the DIGEST-MD5 SASL mechanism.
+The option syntax is:
+</P><DL CLASS="description"><DT CLASS="dt-description"><B><TT>{fqdn, undefined|FqdnString|[FqdnString]}.</TT></B></DT></DL><P> <A NAME="internalauth"></A> </P><!--TOC subsubsection Internal-->
 <H4 CLASS="subsubsection"><!--SEC ANCHOR --><A HREF="#internalauth">Internal</A></H4><!--SEC END --><P> <A NAME="internalauth"></A> 
 </P><P><TT>ejabberd</TT> uses its internal Mnesia database as the default authentication method.
-The value <TT>internal</TT> will enable the internal authentication method.</P><P>Examples:
+The value <TT>internal</TT> will enable the internal authentication method.</P><P>The option <TT>{auth_password_format, plain|scram}</TT>
+defines in what format the users passwords are stored:
+</P><DL CLASS="description"><DT CLASS="dt-description">
+<B><TT>plain</TT></B></DT><DD CLASS="dd-description">
+The password is stored as plain text in the database.
+This is risky because the passwords can be read if your database gets compromised.
+This is the default value.
+This format allows clients to authenticate using:
+the old Jabber Non-SASL (<A HREF="http://xmpp.org/extensions/xep-0078.html">XEP-0078</A>), <TT>SASL PLAIN</TT>,
+<TT>SASL DIGEST-MD5</TT>, and <TT>SASL SCRAM-SHA-1</TT>.</DD><DT CLASS="dt-description"><B><TT>scram</TT></B></DT><DD CLASS="dd-description">
+The password is not stored, only some information that allows to verify the hash provided by the client.
+It is impossible to obtain the original plain password from the stored information;
+for this reason, when this value is configured it cannot be changed to <TT>plain</TT> anymore.
+This format allows clients to authenticate using: <TT>SASL PLAIN</TT> and <TT>SASL SCRAM-SHA-1</TT>.
+</DD></DL><P>Examples:
 </P><UL CLASS="itemize"><LI CLASS="li-itemize">
 To use internal authentication on <TT>example.org</TT> and LDAP
 authentication on <TT>example.net</TT>:
 <PRE CLASS="verbatim">{host_config, "example.org", [{auth_method, [internal]}]}.
 {host_config, "example.net", [{auth_method, [ldap]}]}.
-</PRE></LI><LI CLASS="li-itemize">To use internal authentication on all virtual hosts:
+</PRE></LI><LI CLASS="li-itemize">To use internal authentication with hashed passwords on all virtual hosts:
 <PRE CLASS="verbatim">{auth_method, internal}.
+{auth_password_format, scram}.
 </PRE></LI></UL><P> <A NAME="extauth"></A> </P><!--TOC subsubsection External Script-->
 <H4 CLASS="subsubsection"><!--SEC ANCHOR --><A HREF="#extauth">External Script</A></H4><!--SEC END --><P> <A NAME="extauth"></A> 
 </P><P>In this authentication method, when <TT>ejabberd</TT> starts,
@@ -1083,7 +1118,7 @@ the CacheTimeInteger indicates the number of seconds that ejabberd can reuse
 the authentication information since the user last disconnected,
 to verify again the user authentication without querying again the extauth script.
 Note: caching should not be enabled in a host if internal auth is also enabled.
-If caching is enabled, <TT>mod_last</TT> or <TT>mod_last_odbc</TT> must be enabled also in that vhost.
+If caching is enabled, <TT>mod_last</TT> must be enabled also in that vhost.
 </DD></DL><P>This example sets external authentication, the extauth script, enables caching for 10 minutes,
 and starts three instances of the script for each virtual host defined in ejabberd:
 </P><PRE CLASS="verbatim">{auth_method, [external]}.
@@ -1178,7 +1213,7 @@ attacks.
 </LI><LI CLASS="li-itemize">You may want to allow login access only for certain users. <TT>pam_listfile.so</TT>
 module provides such functionality.
 </LI><LI CLASS="li-itemize">If you use <TT>pam_winbind</TT> to authorise against a Windows Active Directory,
-then <TT>/etc/nssswitch.conf</TT> must be configured to use <TT>winbind</TT> as well.
+then <TT>/etc/nsswitch.conf</TT> must be configured to use <TT>winbind</TT> as well.
 </LI></UL><P> <A NAME="accessrules"></A> </P><!--TOC subsection Access Rules-->
 <H3 CLASS="subsection"><!--SEC ANCHOR --><A NAME="htoc25">3.1.5</A>&#XA0;&#XA0;<A HREF="#accessrules">Access Rules</A></H3><!--SEC END --><P> <A NAME="accessrules"></A> 
 </P><P> <A NAME="ACLDefinition"></A> </P><!--TOC subsubsection ACL Definition-->
@@ -1208,9 +1243,9 @@ declarations of ACLs in the configuration file have the following syntax:
 </PRE></DD><DT CLASS="dt-description"><B><TT>{user_regexp, Regexp}</TT></B></DT><DD CLASS="dd-description"> Matches any local user with a name that
 matches <TT>Regexp</TT> on local virtual hosts. Example:
 <PRE CLASS="verbatim">{acl, tests, {user_regexp, "^test[0-9]*$"}}.
-</PRE></DD><DT CLASS="dt-description"><B><TT>{user_regexp, UserRegexp, Server}</TT></B></DT><DD CLASS="dd-description"> Matches any user with a name
+</PRE></DD><DT CLASS="dt-description"><B><TT>{user_regexp, Regexp, Server}</TT></B></DT><DD CLASS="dd-description"> Matches any user with a name
 that matches <TT>Regexp</TT> at server <TT>Server</TT>. Example:
-<PRE CLASS="verbatim">{acl, tests, {user_Userregexp, "^test", "example.org"}}.
+<PRE CLASS="verbatim">{acl, tests, {user_regexp, "^test", "example.org"}}.
 </PRE></DD><DT CLASS="dt-description"><B><TT>{server_regexp, Regexp}</TT></B></DT><DD CLASS="dd-description"> Matches any JID from the server that
 matches <TT>Regexp</TT>. Example:
 <PRE CLASS="verbatim">{acl, icq, {server_regexp, "^icq\\."}}.
@@ -1317,7 +1352,7 @@ using ImageMagick&#X2019;s Convert program.</P><P>The configurable options are:
 </P><DL CLASS="description"><DT CLASS="dt-description">
 <B><TT>{captcha_cmd, Path}</TT></B></DT><DD CLASS="dd-description"> 
 Full path to a script that generates the image.
-The default value is an empty string: <TT>""</TT>
+The default value disables the feature: <TT>undefined</TT>
 </DD><DT CLASS="dt-description"><B><TT>{captcha_host, ProtocolHostPort}</TT></B></DT><DD CLASS="dd-description"> 
 ProtocolHostPort is a string with the host, and optionally the Protocol and Port number.
 It must identify where ejabberd listens for CAPTCHA requests.
@@ -1537,12 +1572,10 @@ MySQL interface. Anyway, the first configuration step is to define the odbc
 </PRE><P> <A NAME="mysqlstorage"></A> </P><!--TOC subsubsection Storage-->
 <H4 CLASS="subsubsection"><!--SEC ANCHOR --><A HREF="#mysqlstorage">Storage</A></H4><!--SEC END --><P> <A NAME="mysqlstorage"></A> 
 </P><P>MySQL also can be used to store information into from several <TT>ejabberd</TT>
-modules. See section&#XA0;<A HREF="#modoverview">3.3.1</A> to see which modules have a version
-with the &#X2018;_odbc&#X2019;. This suffix indicates that the module can be used with
+modules. See section&#XA0;<A HREF="#modoverview">3.3.1</A> to see which modules can be used with
 relational databases like MySQL. To enable storage to your database, just make
-sure that your database is running well (see previous sections), and replace the
-suffix-less or ldap module variant with the odbc module variant. Keep in mind
-that you cannot have several variants of the same module loaded!</P><P> <A NAME="mssql"></A> </P><!--TOC subsection Microsoft SQL Server-->
+sure that your database is running well (see previous sections), and add the
+module option <TT>{db_type, odbc}</TT>.</P><P> <A NAME="mssql"></A> </P><!--TOC subsection Microsoft SQL Server-->
 <H3 CLASS="subsection"><!--SEC ANCHOR --><A NAME="htoc34">3.2.2</A>&#XA0;&#XA0;<A HREF="#mssql">Microsoft SQL Server</A></H3><!--SEC END --><P> <A NAME="mssql"></A> 
 </P><P>Although this section will describe <TT>ejabberd</TT>&#X2019;s configuration when you want to
 use Microsoft SQL Server, it does not describe Microsoft SQL Server&#X2019;s
@@ -1569,13 +1602,10 @@ is the same as the configuration for
 ODBC compatible servers (see section&#XA0;<A HREF="#odbcauth">3.2.4</A>).</P><P> <A NAME="mssqlstorage"></A> </P><!--TOC subsubsection Storage-->
 <H4 CLASS="subsubsection"><!--SEC ANCHOR --><A HREF="#mssqlstorage">Storage</A></H4><!--SEC END --><P> <A NAME="mssqlstorage"></A> 
 </P><P>Microsoft SQL Server also can be used to store information into from several
-<TT>ejabberd</TT> modules. See section&#XA0;<A HREF="#modoverview">3.3.1</A> to see which modules have
-a version with the &#X2018;_odbc&#X2019;. This suffix indicates that the module can be used
-with relational databases like Microsoft SQL Server. To enable storage to your
-database, just make sure that your database is running well (see previous
-sections), and replace the suffix-less or ldap module variant with the odbc
-module variant. Keep in mind that you cannot have several variants of the same
-module loaded!</P><P> <A NAME="pgsql"></A> </P><!--TOC subsection PostgreSQL-->
+modules. See section&#XA0;<A HREF="#modoverview">3.3.1</A> to see which modules can be used with
+relational databases like MySQL. To enable storage to your database, just make
+sure that your database is running well (see previous sections), and add the
+module option <TT>{db_type, odbc}</TT>.</P><P> <A NAME="pgsql"></A> </P><!--TOC subsection PostgreSQL-->
 <H3 CLASS="subsection"><!--SEC ANCHOR --><A NAME="htoc35">3.2.3</A>&#XA0;&#XA0;<A HREF="#pgsql">PostgreSQL</A></H3><!--SEC END --><P> <A NAME="pgsql"></A> 
 </P><P>Although this section will describe <TT>ejabberd</TT>&#X2019;s configuration when you want to
 use the native PostgreSQL driver, it does not describe PostgreSQL&#X2019;s installation
@@ -1627,12 +1657,10 @@ PostgreSQL interface. Anyway, the first configuration step is to define the odbc
 </PRE><P> <A NAME="pgsqlstorage"></A> </P><!--TOC subsubsection Storage-->
 <H4 CLASS="subsubsection"><!--SEC ANCHOR --><A HREF="#pgsqlstorage">Storage</A></H4><!--SEC END --><P> <A NAME="pgsqlstorage"></A> 
 </P><P>PostgreSQL also can be used to store information into from several <TT>ejabberd</TT>
-modules. See section&#XA0;<A HREF="#modoverview">3.3.1</A> to see which modules have a version
-with the &#X2018;_odbc&#X2019;. This suffix indicates that the module can be used with
-relational databases like PostgreSQL. To enable storage to your database, just
-make sure that your database is running well (see previous sections), and
-replace the suffix-less or ldap module variant with the odbc module variant.
-Keep in mind that you cannot have several variants of the same module loaded!</P><P> <A NAME="odbc"></A> </P><!--TOC subsection ODBC Compatible-->
+modules. See section&#XA0;<A HREF="#modoverview">3.3.1</A> to see which modules can be used with
+relational databases like MySQL. To enable storage to your database, just make
+sure that your database is running well (see previous sections), and add the
+module option <TT>{db_type, odbc}</TT>.</P><P> <A NAME="odbc"></A> </P><!--TOC subsection ODBC Compatible-->
 <H3 CLASS="subsection"><!--SEC ANCHOR --><A NAME="htoc36">3.2.4</A>&#XA0;&#XA0;<A HREF="#odbc">ODBC Compatible</A></H3><!--SEC END --><P> <A NAME="odbc"></A> 
 </P><P>Although this section will describe <TT>ejabberd</TT>&#X2019;s configuration when you want to
 use the ODBC driver, it does not describe the installation and database creation
@@ -1671,13 +1699,11 @@ example:
 </PRE><P> <A NAME="odbcstorage"></A> </P><!--TOC subsubsection Storage-->
 <H4 CLASS="subsubsection"><!--SEC ANCHOR --><A HREF="#odbcstorage">Storage</A></H4><!--SEC END --><P> <A NAME="odbcstorage"></A> 
 </P><P>An ODBC compatible database also can be used to store information into from
-several <TT>ejabberd</TT> modules. See section&#XA0;<A HREF="#modoverview">3.3.1</A> to see which
-modules have a version with the &#X2018;_odbc&#X2019;. This suffix indicates that the module
-can be used with ODBC compatible relational databases. To enable storage to your
-database, just make sure that your database is running well (see previous
-sections), and replace the suffix-less or ldap module variant with the odbc
-module variant. Keep in mind that you cannot have several variants of the same
-module loaded!</P><P> <A NAME="ldap"></A> </P><!--TOC subsection LDAP-->
+several <TT>ejabberd</TT>
+modules. See section&#XA0;<A HREF="#modoverview">3.3.1</A> to see which modules can be used with
+relational databases like MySQL. To enable storage to your database, just make
+sure that your database is running well (see previous sections), and add the
+module option <TT>{db_type, odbc}</TT>.</P><P> <A NAME="ldap"></A> </P><!--TOC subsection LDAP-->
 <H3 CLASS="subsection"><!--SEC ANCHOR --><A NAME="htoc37">3.2.5</A>&#XA0;&#XA0;<A HREF="#ldap">LDAP</A></H3><!--SEC END --><P> <A NAME="ldap"></A> 
 </P><P><TT>ejabberd</TT> has built-in LDAP support. You can authenticate users against LDAP
 server and use LDAP directory as vCard storage.</P><P>Usually <TT>ejabberd</TT> treats LDAP as a read-only storage:
@@ -1701,6 +1727,16 @@ This option specifies whether to verify LDAP server certificate or not when TLS 
 When <TT>hard</TT> is enabled <TT>ejabberd</TT> doesn&#X2019;t proceed if a certificate is invalid.
 When <TT>soft</TT> is enabled <TT>ejabberd</TT> proceeds even if check fails.
 The default is <TT>false</TT> which means no checks are performed.
+</DD><DT CLASS="dt-description"><B><TT>{ldap_tls_cacertfile, Path}</TT></B></DT><DD CLASS="dd-description"> 
+Path to file containing PEM encoded CA certificates. This option is needed
+(and required) when TLS verification is enabled.
+</DD><DT CLASS="dt-description"><B><TT>{ldap_tls_depth, Number}</TT></B></DT><DD CLASS="dd-description"> 
+Specifies the maximum verification depth when TLS verification is enabled,
+i.e. how far in a chain of certificates the verification process can proceed
+before the verification is considered to fail.
+Peer certificate = 0, CA certificate = 1, higher level CA certificate = 2, etc.
+The value 2 thus means that a chain can at most contain peer cert,
+CA cert, next CA cert, and an additional CA cert. The default value is 1.
 </DD><DT CLASS="dt-description"><B><TT>{ldap_port, Number}</TT></B></DT><DD CLASS="dd-description"> Port to connect to your LDAP server.
 The default port is&#XA0;389 if encryption is disabled; and 636 if encryption is enabled.
 If you configure a value, it is stored in <TT>ejabberd</TT>&#X2019;s database.
@@ -1710,6 +1746,7 @@ the value previously stored in the database will be used instead of the default 
 is&#XA0;<TT>""</TT> which means &#X2018;anonymous connection&#X2019;.
 </DD><DT CLASS="dt-description"><B><TT>{ldap_password, Password}</TT></B></DT><DD CLASS="dd-description"> Bind password. The default
 value is <TT>""</TT>.
+</DD><DT CLASS="dt-description"><B><TT>{ldap_deref_aliases, never|always|finding|searching}</TT></B></DT><DD CLASS="dd-description">  Whether or not to dereference aliases. The default is <TT>never</TT>.
 </DD></DL><P>Example:
 </P><PRE CLASS="verbatim">{auth_method, ldap}.
 {ldap_servers, ["ldap.example.org"]}.
@@ -1925,61 +1962,37 @@ all entries end with a comma:
 <TR><TD ALIGN=left NOWRAP><A HREF="#modhttpfileserver"><TT>mod_http_fileserver</TT></A></TD><TD ALIGN=left NOWRAP>Small HTTP file server</TD><TD ALIGN=left NOWRAP>&nbsp;</TD></TR>
 <TR><TD ALIGN=left NOWRAP><A HREF="#modirc"><TT>mod_irc</TT></A></TD><TD ALIGN=left NOWRAP>IRC transport</TD><TD ALIGN=left NOWRAP>&nbsp;</TD></TR>
 <TR><TD ALIGN=left NOWRAP><A HREF="#modlast"><TT>mod_last</TT></A></TD><TD ALIGN=left NOWRAP>Last Activity (<A HREF="http://xmpp.org/extensions/xep-0012.html">XEP-0012</A>)</TD><TD ALIGN=left NOWRAP>&nbsp;</TD></TR>
-<TR><TD ALIGN=left NOWRAP><A HREF="#modlast"><TT>mod_last_odbc</TT></A></TD><TD ALIGN=left NOWRAP>Last Activity (<A HREF="http://xmpp.org/extensions/xep-0012.html">XEP-0012</A>)</TD><TD ALIGN=left NOWRAP>supported DB (*)</TD></TR>
 <TR><TD ALIGN=left NOWRAP><A HREF="#modmuc"><TT>mod_muc</TT></A></TD><TD ALIGN=left NOWRAP>Multi-User Chat (<A HREF="http://xmpp.org/extensions/xep-0045.html">XEP-0045</A>)</TD><TD ALIGN=left NOWRAP>&nbsp;</TD></TR>
 <TR><TD ALIGN=left NOWRAP><A HREF="#modmuclog"><TT>mod_muc_log</TT></A></TD><TD ALIGN=left NOWRAP>Multi-User Chat room logging</TD><TD ALIGN=left NOWRAP><TT>mod_muc</TT></TD></TR>
 <TR><TD ALIGN=left NOWRAP><A HREF="#modoffline"><TT>mod_offline</TT></A></TD><TD ALIGN=left NOWRAP>Offline message storage (<A HREF="http://xmpp.org/extensions/xep-0160.html">XEP-0160</A>)</TD><TD ALIGN=left NOWRAP>&nbsp;</TD></TR>
-<TR><TD ALIGN=left NOWRAP><A HREF="#modoffline"><TT>mod_offline_odbc</TT></A></TD><TD ALIGN=left NOWRAP>Offline message storage (<A HREF="http://xmpp.org/extensions/xep-0160.html">XEP-0160</A>)</TD><TD ALIGN=left NOWRAP>supported DB (*)</TD></TR>
 <TR><TD ALIGN=left NOWRAP><A HREF="#modping"><TT>mod_ping</TT></A></TD><TD ALIGN=left NOWRAP>XMPP Ping and periodic keepalives (<A HREF="http://xmpp.org/extensions/xep-0199.html">XEP-0199</A>)</TD><TD ALIGN=left NOWRAP>&nbsp;</TD></TR>
-<TR><TD ALIGN=left NOWRAP><A HREF="#modprescounter"><TT>mod_privacy</TT></A></TD><TD ALIGN=left NOWRAP>Detect presence subscription flood</TD><TD ALIGN=left NOWRAP>&nbsp;</TD></TR>
+<TR><TD ALIGN=left NOWRAP><A HREF="#modprescounter"><TT>mod_pres_counter</TT></A></TD><TD ALIGN=left NOWRAP>Detect presence subscription flood</TD><TD ALIGN=left NOWRAP>&nbsp;</TD></TR>
 <TR><TD ALIGN=left NOWRAP><A HREF="#modprivacy"><TT>mod_privacy</TT></A></TD><TD ALIGN=left NOWRAP>Blocking Communication (<A HREF="http://xmpp.org/extensions/xep-0016.html">XEP-0016</A>)</TD><TD ALIGN=left NOWRAP>&nbsp;</TD></TR>
-<TR><TD ALIGN=left NOWRAP><A HREF="#modprivacy"><TT>mod_privacy_odbc</TT></A></TD><TD ALIGN=left NOWRAP>Blocking Communication (<A HREF="http://xmpp.org/extensions/xep-0016.html">XEP-0016</A>)</TD><TD ALIGN=left NOWRAP>supported DB (*)</TD></TR>
 <TR><TD ALIGN=left NOWRAP><A HREF="#modprivate"><TT>mod_private</TT></A></TD><TD ALIGN=left NOWRAP>Private XML Storage (<A HREF="http://xmpp.org/extensions/xep-0049.html">XEP-0049</A>)</TD><TD ALIGN=left NOWRAP>&nbsp;</TD></TR>
-<TR><TD ALIGN=left NOWRAP><A HREF="#modprivate"><TT>mod_private_odbc</TT></A></TD><TD ALIGN=left NOWRAP>Private XML Storage (<A HREF="http://xmpp.org/extensions/xep-0049.html">XEP-0049</A>)</TD><TD ALIGN=left NOWRAP>supported DB (*)</TD></TR>
 <TR><TD ALIGN=left NOWRAP><A HREF="#modproxy"><TT>mod_proxy65</TT></A></TD><TD ALIGN=left NOWRAP>SOCKS5 Bytestreams (<A HREF="http://xmpp.org/extensions/xep-0065.html">XEP-0065</A>)</TD><TD ALIGN=left NOWRAP>&nbsp;</TD></TR>
 <TR><TD ALIGN=left NOWRAP><A HREF="#modpubsub"><TT>mod_pubsub</TT></A></TD><TD ALIGN=left NOWRAP>Pub-Sub (<A HREF="http://xmpp.org/extensions/xep-0060.html">XEP-0060</A>), PEP (<A HREF="http://xmpp.org/extensions/xep-0163.html">XEP-0163</A>)</TD><TD ALIGN=left NOWRAP><TT>mod_caps</TT></TD></TR>
 <TR><TD ALIGN=left NOWRAP><A HREF="#modpubsub"><TT>mod_pubsub_odbc</TT></A></TD><TD ALIGN=left NOWRAP>Pub-Sub (<A HREF="http://xmpp.org/extensions/xep-0060.html">XEP-0060</A>), PEP (<A HREF="http://xmpp.org/extensions/xep-0163.html">XEP-0163</A>)</TD><TD ALIGN=left NOWRAP>supported DB (*) and <TT>mod_caps</TT></TD></TR>
 <TR><TD ALIGN=left NOWRAP><A HREF="#modregister"><TT>mod_register</TT></A></TD><TD ALIGN=left NOWRAP>In-Band Registration (<A HREF="http://xmpp.org/extensions/xep-0077.html">XEP-0077</A>)</TD><TD ALIGN=left NOWRAP>&nbsp;</TD></TR>
 <TR><TD ALIGN=left NOWRAP><A HREF="#modregisterweb"><TT>mod_register_web</TT></A></TD><TD ALIGN=left NOWRAP>Web for Account Registrations</TD><TD ALIGN=left NOWRAP>&nbsp;</TD></TR>
 <TR><TD ALIGN=left NOWRAP><A HREF="#modroster"><TT>mod_roster</TT></A></TD><TD ALIGN=left NOWRAP>Roster management (XMPP IM)</TD><TD ALIGN=left NOWRAP>&nbsp;</TD></TR>
-<TR><TD ALIGN=left NOWRAP><A HREF="#modroster"><TT>mod_roster_odbc</TT></A></TD><TD ALIGN=left NOWRAP>Roster management (XMPP IM)</TD><TD ALIGN=left NOWRAP>supported DB (*)</TD></TR>
 <TR><TD ALIGN=left NOWRAP><A HREF="#modservicelog"><TT>mod_service_log</TT></A></TD><TD ALIGN=left NOWRAP>Copy user messages to logger service</TD><TD ALIGN=left NOWRAP>&nbsp;</TD></TR>
-<TR><TD ALIGN=left NOWRAP><A HREF="#modsharedroster"><TT>mod_shared_roster</TT></A></TD><TD ALIGN=left NOWRAP>Shared roster management</TD><TD ALIGN=left NOWRAP><TT>mod_roster</TT> or</TD></TR>
-<TR><TD ALIGN=left NOWRAP>&nbsp;</TD><TD ALIGN=left NOWRAP>&nbsp;</TD><TD ALIGN=left NOWRAP><TT>mod_roster_odbc</TT></TD></TR>
-<TR><TD ALIGN=left NOWRAP><A HREF="#modsharedrosterldap"><TT>mod_shared_roster_ldap</TT></A></TD><TD ALIGN=left NOWRAP>LDAP Shared roster management</TD><TD ALIGN=left NOWRAP><TT>mod_roster</TT> or</TD></TR>
-<TR><TD ALIGN=left NOWRAP>&nbsp;</TD><TD ALIGN=left NOWRAP>&nbsp;</TD><TD ALIGN=left NOWRAP><TT>mod_roster_odbc</TT></TD></TR>
+<TR><TD ALIGN=left NOWRAP><A HREF="#modsharedroster"><TT>mod_shared_roster</TT></A></TD><TD ALIGN=left NOWRAP>Shared roster management</TD><TD ALIGN=left NOWRAP><TT>mod_roster</TT></TD></TR>
+<TR><TD ALIGN=left NOWRAP><A HREF="#modsharedrosterldap"><TT>mod_shared_roster_ldap</TT></A></TD><TD ALIGN=left NOWRAP>LDAP Shared roster management</TD><TD ALIGN=left NOWRAP><TT>mod_roster</TT></TD></TR>
 <TR><TD ALIGN=left NOWRAP><A HREF="#modsic"><TT>mod_sic</TT></A></TD><TD ALIGN=left NOWRAP>Server IP Check (<A HREF="http://xmpp.org/extensions/xep-0279.html">XEP-0279</A>)</TD><TD ALIGN=left NOWRAP>&nbsp;</TD></TR>
 <TR><TD ALIGN=left NOWRAP><A HREF="#modstats"><TT>mod_stats</TT></A></TD><TD ALIGN=left NOWRAP>Statistics Gathering (<A HREF="http://xmpp.org/extensions/xep-0039.html">XEP-0039</A>)</TD><TD ALIGN=left NOWRAP>&nbsp;</TD></TR>
 <TR><TD ALIGN=left NOWRAP><A HREF="#modtime"><TT>mod_time</TT></A></TD><TD ALIGN=left NOWRAP>Entity Time (<A HREF="http://xmpp.org/extensions/xep-0202.html">XEP-0202</A>)</TD><TD ALIGN=left NOWRAP>&nbsp;</TD></TR>
 <TR><TD ALIGN=left NOWRAP><A HREF="#modvcard"><TT>mod_vcard</TT></A></TD><TD ALIGN=left NOWRAP>vcard-temp (<A HREF="http://xmpp.org/extensions/xep-0054.html">XEP-0054</A>)</TD><TD ALIGN=left NOWRAP>&nbsp;</TD></TR>
 <TR><TD ALIGN=left NOWRAP><A HREF="#modvcardldap"><TT>mod_vcard_ldap</TT></A></TD><TD ALIGN=left NOWRAP>vcard-temp (<A HREF="http://xmpp.org/extensions/xep-0054.html">XEP-0054</A>)</TD><TD ALIGN=left NOWRAP>LDAP server</TD></TR>
-<TR><TD ALIGN=left NOWRAP><A HREF="#modvcard"><TT>mod_vcard_odbc</TT></A></TD><TD ALIGN=left NOWRAP>vcard-temp (<A HREF="http://xmpp.org/extensions/xep-0054.html">XEP-0054</A>)</TD><TD ALIGN=left NOWRAP>supported DB (*)</TD></TR>
-<TR><TD ALIGN=left NOWRAP><A HREF="#modvcardxupdate"><TT>mod_vcard_xupdate</TT></A></TD><TD ALIGN=left NOWRAP>vCard-Based Avatars (<A HREF="http://xmpp.org/extensions/xep-0153.html">XEP-0153</A>)</TD><TD ALIGN=left NOWRAP><TT>mod_vcard</TT> or <TT>mod_vcard_odbc</TT></TD></TR>
+<TR><TD ALIGN=left NOWRAP><A HREF="#modvcardxupdate"><TT>mod_vcard_xupdate</TT></A></TD><TD ALIGN=left NOWRAP>vCard-Based Avatars (<A HREF="http://xmpp.org/extensions/xep-0153.html">XEP-0153</A>)</TD><TD ALIGN=left NOWRAP><TT>mod_vcard</TT></TD></TR>
 <TR><TD ALIGN=left NOWRAP><A HREF="#modversion"><TT>mod_version</TT></A></TD><TD ALIGN=left NOWRAP>Software Version (<A HREF="http://xmpp.org/extensions/xep-0092.html">XEP-0092</A>)</TD><TD ALIGN=left NOWRAP>&nbsp;</TD></TR>
 </TABLE>
 <DIV CLASS="center"><HR WIDTH="80%" SIZE=2></DIV></DIV></BLOCKQUOTE><UL CLASS="itemize"><LI CLASS="li-itemize">
 (*) This module requires a supported database. For a list of supported databases, see section&#XA0;<A HREF="#database">3.2</A>.
 </LI></UL><P>You can see which database backend each module needs by looking at the suffix:
 </P><UL CLASS="itemize"><LI CLASS="li-itemize">
-No suffix, this means that the modules uses Erlang&#X2019;s built-in database
-Mnesia as backend.
-</LI><LI CLASS="li-itemize">&#X2018;_odbc&#X2019;, this means that the module needs a supported database
-(see&#XA0;<A HREF="#database">3.2</A>) as backend.
+No suffix, this means that the module uses Erlang&#X2019;s built-in database
+Mnesia as backend, or a ODBC database in some cases (see&#XA0;<A HREF="#database">3.2</A>).
 </LI><LI CLASS="li-itemize">&#X2018;_ldap&#X2019;, this means that the module needs an LDAP server as backend.
-</LI></UL><P>If you want to,
-it is possible to use a relational database to store the tables created by some ejabberd modules.
-You can do this by changing the module name to a name with an
-<TT>_odbc</TT> suffix in <TT>ejabberd</TT> config file. You can use a relational
-database for the following data:</P><UL CLASS="itemize"><LI CLASS="li-itemize">
-Last connection date and time: Use <TT>mod_last_odbc</TT> instead of
-<TT>mod_last</TT>.
-</LI><LI CLASS="li-itemize">Offline messages: Use <TT>mod_offline_odbc</TT> instead of
-<TT>mod_offline</TT>.
-</LI><LI CLASS="li-itemize">Rosters: Use <TT>mod_roster_odbc</TT> instead of <TT>mod_roster</TT>.
-</LI><LI CLASS="li-itemize">Users&#X2019; VCARD: Use <TT>mod_vcard_odbc</TT> instead of <TT>mod_vcard</TT>.
-</LI><LI CLASS="li-itemize">Private XML storage: Use <TT>mod_private_odbc</TT> instead of <TT>mod_private</TT>.
-</LI><LI CLASS="li-itemize">User rules for blocking communications: Use <TT>mod_privacy_odbc</TT> instead of <TT>mod_privacy</TT>.
-</LI><LI CLASS="li-itemize">Pub-Sub nodes, items and subscriptions: Use <TT>mod_pubsub_odbc</TT> instead of <TT>mod_pubsub</TT>.
 </LI></UL><P>You can find more
 <A HREF="http://www.ejabberd.im/contributions">contributed modules</A> on the
 <TT>ejabberd</TT> website. Please remember that these contributions might not work or
@@ -2071,13 +2084,17 @@ login. The message is <EM>not sent</EM> to any currently connected user.
 Any message sent to this JID removes the existing message of the day (MOTD).
 </DD></DL><P>Options:
 </P><DL CLASS="description"><DT CLASS="dt-description">
-<B><TT>{access, AccessName}</TT></B></DT><DD CLASS="dd-description"> This option specifies who is allowed to
+<B><TT>{db_type, mnesia|odbc}</TT></B></DT><DD CLASS="dd-description"> 
+Define the type of storage where the module will create the tables and store user information.
+The default is to store in the internal Mnesia database.
+If <TT>odbc</TT> value is defined, make sure you have defined the database, see&#XA0;<A HREF="#database">3.2</A>.
+</DD><DT CLASS="dt-description"><B><TT>{access, AccessName}</TT></B></DT><DD CLASS="dd-description"> This option specifies who is allowed to
 send announcements and to set the message of the day (by default, nobody is
 able to send such messages).
 </DD></DL><P>Examples:
 </P><UL CLASS="itemize"><LI CLASS="li-itemize">
 Only administrators can send announcements:
-<PRE CLASS="verbatim">{access, announce, [{allow, admins}]}.
+<PRE CLASS="verbatim">{access, announce, [{allow, admin}]}.
 
 {modules,
  [
@@ -2089,9 +2106,9 @@ Only administrators can send announcements:
 </PRE></LI><LI CLASS="li-itemize">Administrators as well as the direction can send announcements:
 <PRE CLASS="verbatim">{acl, direction, {user, "big_boss", "example.org"}}.
 {acl, direction, {user, "assistant", "example.org"}}.
-{acl, admins, {user, "admin", "example.org"}}.
+{acl, admin, {user, "admin", "example.org"}}.
 
-{access, announce, [{allow, admins},
+{access, announce, [{allow, admin},
                     {allow, direction}]}.
 
 {modules,
@@ -2347,6 +2364,10 @@ service. If the <TT>host</TT> option is not specified, the Jabber ID will be the
 hostname of the virtual host with the prefix &#X2018;<TT>irc.</TT>&#X2019;. The keyword "@HOST@"
 is replaced at start time with the real virtual host name.
 
+</DD><DT CLASS="dt-description"><B><TT>{db_type, mnesia|odbc}</TT></B></DT><DD CLASS="dd-description"> 
+Define the type of storage where the module will create the tables and store user information.
+The default is to store in the internal Mnesia database.
+If <TT>odbc</TT> value is defined, make sure you have defined the database, see&#XA0;<A HREF="#database">3.2</A>.
 </DD><DT CLASS="dt-description"><B><TT>{access, AccessName}</TT></B></DT><DD CLASS="dd-description"> This option can be used to specify who
 may use the IRC transport (default value: <TT>all</TT>).
 </DD><DT CLASS="dt-description"><B><TT>{default_encoding, Encoding}</TT></B></DT><DD CLASS="dd-description"> Set the default IRC encoding.
@@ -2387,6 +2408,10 @@ connected user was last active on the server, or to query the uptime of the
 </P><DL CLASS="description"><DT CLASS="dt-description">
 <B><TT>{iqdisc, Discipline}</TT></B></DT><DD CLASS="dd-description"> This specifies
 the processing discipline for Last activity (<TT>jabber:iq:last</TT>) IQ queries (see section&#XA0;<A HREF="#modiqdiscoption">3.3.2</A>).
+</DD><DT CLASS="dt-description"><B><TT>{db_type, mnesia|odbc}</TT></B></DT><DD CLASS="dd-description"> 
+Define the type of storage where the module will create the tables and store user information.
+The default is to store in the internal Mnesia database.
+If <TT>odbc</TT> value is defined, make sure you have defined the database, see&#XA0;<A HREF="#database">3.2</A>.
 </DD></DL><P> <A NAME="modmuc"></A> </P><!--TOC subsection <TT>mod_muc</TT>-->
 <H3 CLASS="subsection"><!--SEC ANCHOR --><A NAME="htoc48">3.3.10</A>&#XA0;&#XA0;<A HREF="#modmuc"><TT>mod_muc</TT></A></H3><!--SEC END --><P> <A NAME="modmuc"></A> 
 </P><P>This module provides a Multi-User Chat (<A HREF="http://xmpp.org/extensions/xep-0045.html">XEP-0045</A>) service.
@@ -2415,6 +2440,10 @@ service. If the <TT>host</TT> option is not specified, the Jabber ID will be the
 hostname of the virtual host with the prefix &#X2018;<TT>conference.</TT>&#X2019;. The keyword "@HOST@"
 is replaced at start time with the real virtual host name.
 
+</DD><DT CLASS="dt-description"><B><TT>{db_type, mnesia|odbc}</TT></B></DT><DD CLASS="dd-description"> 
+Define the type of storage where the module will create the tables and store user information.
+The default is to store in the internal Mnesia database.
+If <TT>odbc</TT> value is defined, make sure you have defined the database, see&#XA0;<A HREF="#database">3.2</A>.
 </DD><DT CLASS="dt-description"><B><TT>{access, AccessName}</TT></B></DT><DD CLASS="dd-description"> You can specify who is allowed to use
 the Multi-User Chat service. By default everyone is allowed to use it.
 </DD><DT CLASS="dt-description"><B><TT>{access_create, AccessName}</TT></B></DT><DD CLASS="dd-description"> To configure who is
@@ -2492,11 +2521,12 @@ discarded. A good value for this option is 4 seconds.
 </DD><DT CLASS="dt-description"><B><TT>{default_room_options, [ {OptionName, OptionValue}, ...]}</TT></B></DT><DD CLASS="dd-description"> 
 This module option allows to define the desired default room options.
 Note that the creator of a room can modify the options of his room
-at any time using a XMPP client with MUC capability.
+at any time using an XMPP client with MUC capability.
 The available room options and the default values are:
 <DL CLASS="description"><DT CLASS="dt-description">
 <B><TT>{allow_change_subj, true|false}</TT></B></DT><DD CLASS="dd-description"> Allow occupants to change the subject.
 </DD><DT CLASS="dt-description"><B><TT>{allow_private_messages, true|false}</TT></B></DT><DD CLASS="dd-description"> Occupants can send private messages to other occupants.
+</DD><DT CLASS="dt-description"><B><TT>{allow_private_messages_from_visitors, anyone|moderators|nobody}</TT></B></DT><DD CLASS="dd-description"> Visitors can send private messages to other occupants.
 </DD><DT CLASS="dt-description"><B><TT>{allow_query_users, true|false}</TT></B></DT><DD CLASS="dd-description"> Occupants can send IQ queries to other occupants.
 </DD><DT CLASS="dt-description"><B><TT>{allow_user_invites, false|true}</TT></B></DT><DD CLASS="dd-description"> Allow occupants to send invitations.
 </DD><DT CLASS="dt-description"><B><TT>{allow_visitor_nickchange, true|false}</TT></B></DT><DD CLASS="dd-description"> Allow visitors to
@@ -2667,6 +2697,10 @@ Define the format of the log files:
 <TT>html</TT> stores in HTML format,
 <TT>plaintext</TT> stores in plain text.
 The default value is <TT>html</TT>.
+</DD><DT CLASS="dt-description"><B><TT>{file_permissions, {Mode, Group}}</TT></B></DT><DD CLASS="dd-description">
+Define the permissions that must be used when creating the log files:
+the number of the mode, and the numeric id of the group that will own the files.
+The default value is <TT>{644, 33}</TT>.
 </DD><DT CLASS="dt-description"><B><TT>{outdir, Path}</TT></B></DT><DD CLASS="dd-description">
 This option sets the full path to the directory in which the HTML files should
 be stored. Make sure the <TT>ejabberd</TT> daemon user has write access on that
@@ -2715,10 +2749,10 @@ used. The names of the log files will only contain the day (number),
 and there will be subdirectories for each year and month. The log files will
 be stored in /var/www/muclogs, and the local time will be used. Finally, the
 top link will be the default <CODE>&lt;a href="/"&gt;Home&lt;/a&gt;</CODE>.
-<PRE CLASS="verbatim">{acl, admins, {user, "admin1", "example.org"}}.
-{acl, admins, {user, "admin2", "example.net"}}.
+<PRE CLASS="verbatim">{acl, admin, {user, "admin1", "example.org"}}.
+{acl, admin, {user, "admin2", "example.net"}}.
 
-{access, muc_log, [{allow, admins},
+{access, muc_log, [{allow, admin},
                    {deny, all}]}.
 
 {modules,
@@ -2728,6 +2762,8 @@ top link will be the default <CODE>&lt;a href="/"&gt;Home&lt;/a&gt;</CODE>.
                  {access_log, muc_log},
                  {cssfile, false},
                  {dirtype, subdirs},
+                 {dirtype, subdirs},
+                 {file_permissions, {644, 33}},
                  {outdir, "/var/www/muclogs"},
                  {timezone, local}
                 ]},
@@ -2741,7 +2777,11 @@ sent to an offline user will be stored on the server until that user comes
 online again. Thus it is very similar to how email works. Note that
 <TT>ejabberdctl</TT> has a command to delete expired messages
 (see section&#XA0;<A HREF="#ejabberdctl">4.1</A>).</P><DL CLASS="description"><DT CLASS="dt-description">
-<B><TT>{access_max_user_messages, AccessName}</TT></B></DT><DD CLASS="dd-description">
+<B><TT>{db_type, mnesia|odbc}</TT></B></DT><DD CLASS="dd-description"> 
+Define the type of storage where the module will create the tables and store user information.
+The default is to store in the internal Mnesia database.
+If <TT>odbc</TT> value is defined, make sure you have defined the database, see&#XA0;<A HREF="#database">3.2</A>.
+</DD><DT CLASS="dt-description"><B><TT>{access_max_user_messages, AccessName}</TT></B></DT><DD CLASS="dd-description">
 This option defines which access rule will be enforced to limit
 the maximum number of offline messages that a user can have (quota).
 When a user has too many offline messages, any new messages that he receive are discarded,
@@ -2846,6 +2886,10 @@ subscription type (or globally).
 </P><DL CLASS="description"><DT CLASS="dt-description">
 <B><TT>{iqdisc, Discipline}</TT></B></DT><DD CLASS="dd-description"> This specifies
 the processing discipline for Blocking Communication (<TT>jabber:iq:privacy</TT>) IQ queries (see section&#XA0;<A HREF="#modiqdiscoption">3.3.2</A>).
+</DD><DT CLASS="dt-description"><B><TT>{db_type, mnesia|odbc}</TT></B></DT><DD CLASS="dd-description"> 
+Define the type of storage where the module will create the tables and store user information.
+The default is to store in the internal Mnesia database.
+If <TT>odbc</TT> value is defined, make sure you have defined the database, see&#XA0;<A HREF="#database">3.2</A>.
 </DD></DL><P> <A NAME="modprivate"></A> </P><!--TOC subsection <TT>mod_private</TT>-->
 <H3 CLASS="subsection"><!--SEC ANCHOR --><A NAME="htoc54">3.3.16</A>&#XA0;&#XA0;<A HREF="#modprivate"><TT>mod_private</TT></A></H3><!--SEC END --><P> <A NAME="modprivate"></A> 
 </P><P>This module adds support for Private XML Storage (<A HREF="http://xmpp.org/extensions/xep-0049.html">XEP-0049</A>):
@@ -2858,6 +2902,10 @@ of client-specific preferences; another is Bookmark Storage (<A HREF="http://xmp
 </P><DL CLASS="description"><DT CLASS="dt-description">
 <B><TT>{iqdisc, Discipline}</TT></B></DT><DD CLASS="dd-description"> This specifies
 the processing discipline for Private XML Storage (<TT>jabber:iq:private</TT>) IQ queries (see section&#XA0;<A HREF="#modiqdiscoption">3.3.2</A>).
+</DD><DT CLASS="dt-description"><B><TT>{db_type, mnesia|odbc}</TT></B></DT><DD CLASS="dd-description"> 
+Define the type of storage where the module will create the tables and store user information.
+The default is to store in the internal Mnesia database.
+If <TT>odbc</TT> value is defined, make sure you have defined the database, see&#XA0;<A HREF="#database">3.2</A>.
 </DD></DL><P> <A NAME="modproxy"></A> </P><!--TOC subsection <TT>mod_proxy65</TT>-->
 <H3 CLASS="subsection"><!--SEC ANCHOR --><A NAME="htoc55">3.3.17</A>&#XA0;&#XA0;<A HREF="#modproxy"><TT>mod_proxy65</TT></A></H3><!--SEC END --><P> <A NAME="modproxy"></A> 
 </P><P>This module implements SOCKS5 Bytestreams (<A HREF="http://xmpp.org/extensions/xep-0065.html">XEP-0065</A>).
@@ -3115,7 +3163,9 @@ To enable this feature, configure the options captcha_cmd and captcha_host.</P><
 <B><TT>{registration_watchers, [ JID, ...]}</TT></B></DT><DD CLASS="dd-description"> This option defines a
 list of JIDs which will be notified each time a new account is registered.
 </DD></DL><P>This example configuration shows how to enable the module and the web handler:
-</P><PRE CLASS="verbatim">{listen, [
+</P><PRE CLASS="verbatim">{hosts, ["localhost", "example.org", "example.com"]}.
+
+{listen, [
   ...
   {5281, ejabberd_http, [
     tls,
@@ -3131,7 +3181,8 @@ list of JIDs which will be notified each time a new account is registered.
   {mod_register_web, []},
   ...
  ]}.
-</PRE><P>The users can visit this page: https://localhost:5281/register/
+</PRE><P>For example, the users of the host <TT>example.org</TT> can visit the page:
+<TT>https://example.org:5281/register/</TT>
 It is important to include the last / character in the URL,
 otherwise the subpages URL will be incorrect.</P><P> <A NAME="modroster"></A> </P><!--TOC subsection <TT>mod_roster</TT>-->
 <H3 CLASS="subsection"><!--SEC ANCHOR --><A NAME="htoc59">3.3.21</A>&#XA0;&#XA0;<A HREF="#modroster"><TT>mod_roster</TT></A></H3><!--SEC END --><P> <A NAME="modroster"></A> 
@@ -3141,6 +3192,10 @@ It also supports Roster Versioning (<A HREF="http://xmpp.org/extensions/xep-0237
 </P><DL CLASS="description"><DT CLASS="dt-description">
 <B><TT>{iqdisc, Discipline}</TT></B></DT><DD CLASS="dd-description"> This specifies
 the processing discipline for Roster Management (<TT>jabber:iq:roster</TT>) IQ queries (see section&#XA0;<A HREF="#modiqdiscoption">3.3.2</A>).
+</DD><DT CLASS="dt-description"><B><TT>{db_type, mnesia|odbc}</TT></B></DT><DD CLASS="dd-description"> 
+Define the type of storage where the module will create the tables and store user information.
+The default is to store in the internal Mnesia database.
+If <TT>odbc</TT> value is defined, make sure you have defined the database, see&#XA0;<A HREF="#database">3.2</A>.
 </DD><DT CLASS="dt-description"><B><TT>{versioning, false|true}</TT></B></DT><DD CLASS="dd-description"> Enables
 Roster Versioning.
 This option is disabled by default.
@@ -3199,7 +3254,13 @@ manually add all users to their rosters, and that they cannot permanently delete
 users from the shared roster groups.
 A shared roster group can have members from any XMPP server,
 but the presence will only be available from and to members
-of the same virtual host where the group is created.</P><P>Shared roster groups can be edited <EM>only</EM> via the Web Admin. Each group
+of the same virtual host where the group is created.</P><P>Options:
+</P><DL CLASS="description"><DT CLASS="dt-description">
+<B><TT>{db_type, mnesia|odbc}</TT></B></DT><DD CLASS="dd-description"> 
+Define the type of storage where the module will create the tables and store user information.
+The default is to store in the internal Mnesia database.
+If <TT>odbc</TT> value is defined, make sure you have defined the database, see&#XA0;<A HREF="#database">3.2</A>.
+</DD></DL><P>Shared roster groups can be edited <EM>only</EM> via the Web Admin. Each group
 has a unique identification and the following parameters:
 </P><DL CLASS="description"><DT CLASS="dt-description">
 <B>Name</B></DT><DD CLASS="dd-description"> The name of the group, which will be displayed in the roster.
@@ -3212,8 +3273,9 @@ represents all the registered users in the virtual host;
 which is only recommended for a small server with just a few hundred users.
 The special member directive <TT>@online@</TT>
 represents the online users in the virtual host.
-</DD><DT CLASS="dt-description"><B>Displayed groups</B></DT><DD CLASS="dd-description"> A list of groups that will be in the rosters of this
-group&#X2019;s members.
+</DD><DT CLASS="dt-description"><B>Displayed groups</B></DT><DD CLASS="dd-description">
+A list of groups that will be in the rosters of this group&#X2019;s members.
+A group of other vhost can be identified with <TT>groupid@vhost</TT>
 </DD></DL><P>Examples:
 </P><UL CLASS="itemize"><LI CLASS="li-itemize">
 Take the case of a computer club that wants all its members seeing each
@@ -3545,6 +3607,10 @@ is replaced at start time with the real virtual host name.
 
 </DD><DT CLASS="dt-description"><B><TT>{iqdisc, Discipline}</TT></B></DT><DD CLASS="dd-description"> This specifies
 the processing discipline for <TT>vcard-temp</TT> IQ queries (see section&#XA0;<A HREF="#modiqdiscoption">3.3.2</A>).
+</DD><DT CLASS="dt-description"><B><TT>{db_type, mnesia|odbc}</TT></B></DT><DD CLASS="dd-description"> 
+Define the type of storage where the module will create the tables and store user information.
+The default is to store in the internal Mnesia database.
+If <TT>odbc</TT> value is defined, make sure you have defined the database, see&#XA0;<A HREF="#database">3.2</A>.
 </DD><DT CLASS="dt-description"><B><TT>{search, true|false}</TT></B></DT><DD CLASS="dd-description">This option specifies whether the search
 functionality is enabled or not
 If disabled, the option <TT>host</TT> will be ignored and the
@@ -3560,7 +3626,7 @@ users who added some information to their vCard. The default value is
 </DD><DT CLASS="dt-description"><B><TT>{search_all_hosts, true|false}</TT></B></DT><DD CLASS="dd-description">If this option is set
 to <TT>true</TT>, search operations will apply to all virtual hosts. Otherwise
 only the current host will be searched. The default value is <TT>true</TT>.
-This option is available in <TT>mod_vcard</TT>, but not available in <TT>mod_vcard_odbc</TT>.
+This option is available in <TT>mod_vcard</TT>when using Mnesia, but not when using ODBC storage.
 </DD></DL><P>Examples:
 </P><UL CLASS="itemize"><LI CLASS="li-itemize">
 In this first situation, search results are limited to twenty items,
@@ -3598,8 +3664,9 @@ and LDAP server supports
 its own optional parameters. The first group of parameters has the same
 meaning as the top-level LDAP parameters to set the authentication method:
 <TT>ldap_servers</TT>, <TT>ldap_port</TT>, <TT>ldap_rootdn</TT>,
-<TT>ldap_password</TT>, <TT>ldap_base</TT>, <TT>ldap_uids</TT>, and
-<TT>ldap_filter</TT>. See section&#XA0;<A HREF="#ldapauth">3.2.5</A> for detailed information
+<TT>ldap_password</TT>, <TT>ldap_base</TT>, <TT>ldap_uids</TT>,
+<TT>ldap_deref_aliases</TT> and <TT>ldap_filter</TT>.
+See section&#XA0;<A HREF="#ldapauth">3.2.5</A> for detailed information
 about these options. If one of these options is not set, <TT>ejabberd</TT> will look
 for the top-level option with the same name.</P><P>The second group of parameters
 consists of the following <TT>mod_vcard_ldap</TT>-specific options:</P><DL CLASS="description"><DT CLASS="dt-description">
@@ -3781,7 +3848,13 @@ it is replaced with the element generated by ejabberd.</P><P>By enabling this mo
 and each presence sent by a client produces hash retrieval and a
 presence stanza rewrite.
 For this reason, enabling this module will introduce a computational overhead
-in servers with clients that change frequently their presence.</P><P> <A NAME="modversion"></A> </P><!--TOC subsection <TT>mod_version</TT>-->
+in servers with clients that change frequently their presence.</P><P>Options:
+</P><DL CLASS="description"><DT CLASS="dt-description">
+<B><TT>{db_type, mnesia|odbc}</TT></B></DT><DD CLASS="dd-description"> 
+Define the type of storage where the module will create the tables and store user information.
+The default is to store in the internal Mnesia database.
+If <TT>odbc</TT> value is defined, make sure you have defined the database, see&#XA0;<A HREF="#database">3.2</A>.
+</DD></DL><P> <A NAME="modversion"></A> </P><!--TOC subsection <TT>mod_version</TT>-->
 <H3 CLASS="subsection"><!--SEC ANCHOR --><A NAME="htoc69">3.3.31</A>&#XA0;&#XA0;<A HREF="#modversion"><TT>mod_version</TT></A></H3><!--SEC END --><P> <A NAME="modversion"></A> 
 </P><P>This module implements Software Version (<A HREF="http://xmpp.org/extensions/xep-0092.html">XEP-0092</A>). Consequently, it
 answers <TT>ejabberd</TT>&#X2019;s version when queried.</P><P>Options:
@@ -3826,7 +3899,6 @@ Add the option to the file <TT>ejabberd.cfg</TT>.
 In this example there is no restriction:
 </P><PRE CLASS="verbatim">{ejabberdctl_access_commands, []}.
 </PRE><P>If account <TT>robot1@example.org</TT> is registered in <TT>ejabberd</TT> with password <TT>abcdef</TT>
-(which MD5 is E8B501798950FC58AAD83C8C14978E),
 and <TT>ejabberd.cfg</TT> contains this setting:
 </P><PRE CLASS="verbatim">{hosts, ["example.org"]}.
 {acl, bots, {user, "robot1", "example.org"}}.
@@ -3835,7 +3907,7 @@ and <TT>ejabberd.cfg</TT> contains this setting:
 </PRE><P>then you can do this in the shell:
 </P><PRE CLASS="verbatim">$ ejabberdctl registered_users example.org
 Error: no_auth_provided
-$ ejabberdctl --auth robot1 example.org E8B501798950FC58AAD83C8C14978E registered_users example.org
+$ ejabberdctl --auth robot1 example.org abcdef registered_users example.org
 robot1
 testuser1
 testuser2
@@ -3865,6 +3937,8 @@ all the environment variables and command line parameters.</P><P>The environment
 	This path is used to read the file <TT>.erlang.cookie</TT>.
 </DD><DT CLASS="dt-description"><B><TT>ERL_CRASH_DUMP</TT></B></DT><DD CLASS="dd-description">
 	Path to the file where crash reports will be dumped.
+</DD><DT CLASS="dt-description"><B><TT>ERL_EPMD_ADDRESS</TT></B></DT><DD CLASS="dd-description">
+	IP address where epmd listens for connections (see section <A HREF="#epmd">5.2</A>).
 </DD><DT CLASS="dt-description"><B><TT>ERL_INETRC</TT></B></DT><DD CLASS="dd-description">
 	Indicates which IP name resolution to use.
 	If using <TT>-sname</TT>, specify either this option or <TT>-kernel inetrc filepath</TT>.
@@ -3891,10 +3965,10 @@ This is only useful if you plan to setup an <TT>ejabberd</TT> cluster with nodes
 connections (see section <A HREF="#epmd">5.2</A>).
 </DD><DT CLASS="dt-description"><B><TT>-detached</TT></B></DT><DD CLASS="dd-description">
 Starts the Erlang system detached from the system console.
-	Useful for running daemons and backgrounds processes.
+	Useful for running daemons and background processes.
 </DD><DT CLASS="dt-description"><B><TT>-noinput</TT></B></DT><DD CLASS="dd-description">
 	Ensures that the Erlang system never tries to read any input.
-	Useful for running daemons and backgrounds processes.
+	Useful for running daemons and background processes.
 </DD><DT CLASS="dt-description"><B><TT>-pa /var/lib/ejabberd/ebin</TT></B></DT><DD CLASS="dd-description">
 	Specify the directory where Erlang binary files (*.beam) are located.
 </DD><DT CLASS="dt-description"><B><TT>-s ejabberd</TT></B></DT><DD CLASS="dd-description">
@@ -3973,6 +4047,8 @@ using jabberd1.4 formatted XML files.
 from other Jabber/XMPP servers
 There exist tutorials to
 <A HREF="http://www.ejabberd.im/migrate-to-ejabberd">migrate from other software to ejabberd</A>.
+</DD><DT CLASS="dt-description"><B><TT>export2odbc virtualhost directory</TT></B></DT><DD CLASS="dd-description"> 
+Export virtual host information from Mnesia tables to SQL files.
 </DD><DT CLASS="dt-description"><B><TT>delete_expired_messages</TT></B></DT><DD CLASS="dd-description"> This option can be used to delete old messages
 in offline storage. This might be useful when the number of offline messages
 is very high.
@@ -3996,8 +4072,7 @@ The authentication information is provided when executing a command,
 and is Username, Hostname and Password of a local XMPP account
 that has permission to execute the corresponding command.
 This means that the account must be registered in the local ejabberd,
-because the information will be verified.
-It is possible to provide the plaintext password or its MD5 sum.</P><P>When one or several access restrictions are defined and the
+because the information will be verified.</P><P>When one or several access restrictions are defined and the
 authentication information is provided,
 each restriction is verified until one matches completely:
 the account matches the Access rule,
@@ -4059,11 +4134,11 @@ URL). If you log in with &#X2018;<TT>admin@example.com</TT>&#X2019; on<BR>
  <CODE>http://example.org:5280/admin/server/example.com/</CODE> you can only
 administer the virtual host <TT>example.com</TT>.
 The account &#X2018;<TT>reviewer@example.com</TT>&#X2019; can browse that vhost in read-only mode.
-<PRE CLASS="verbatim">{acl, admins, {user, "admin", "example.net"}}.
-{host_config, "example.com", [{acl, admins, {user, "admin", "example.com"}}]}.
+<PRE CLASS="verbatim">{acl, admin, {user, "admin", "example.net"}}.
+{host_config, "example.com", [{acl, admin, {user, "admin", "example.com"}}]}.
 {host_config, "example.com", [{acl, viewers, {user, "reviewer", "example.com"}}]}.
 
-{access, configure, [{allow, admins}]}.
+{access, configure, [{allow, admin}]}.
 {access, webadmin_view, [{allow, viewers}]}.
 
 {hosts, ["example.org"]}.
@@ -4104,7 +4179,7 @@ the environment variable <TT>EJABBERD_DOC_PATH</TT>.
 See section <A HREF="#erlangconfiguration">4.1.2</A>.</P><P> <A NAME="adhoccommands"></A> </P><!--TOC section Ad-hoc Commands-->
 <H2 CLASS="section"><!--SEC ANCHOR --><A NAME="htoc78">4.4</A>&#XA0;&#XA0;<A HREF="#adhoccommands">Ad-hoc Commands</A></H2><!--SEC END --><P> <A NAME="adhoccommands"></A> </P><P>If you enable <TT>mod_configure</TT> and <TT>mod_adhoc</TT>,
 you can perform several administrative tasks in <TT>ejabberd</TT>
-with a XMPP client.
+with an XMPP client.
 The client must support Ad-Hoc Commands (<A HREF="http://xmpp.org/extensions/xep-0050.html">XEP-0050</A>),
 and you must login in the XMPP server with
 an account with proper privileges.</P><P> <A NAME="changeerlangnodename"></A> </P><!--TOC section Change Computer Hostname-->
@@ -4178,7 +4253,9 @@ and connects to the Erlang node that holds <TT>ejabberd</TT>.
 In order for this communication to work,
 <TT>epmd</TT> must be running and listening for name requests in the port 4369.
 You should block the port 4369 in the firewall in such a way that
-only the programs in your machine can access it.</P><P>If you build a cluster of several <TT>ejabberd</TT> instances,
+only the programs in your machine can access it.
+or configure the option <TT>ERL_EPMD_ADDRESS</TT> in the file <TT>ejabberdctl.cfg</TT>
+(this option works only in Erlang/OTP R14B03 or higher).</P><P>If you build a cluster of several <TT>ejabberd</TT> instances,
 each <TT>ejabberd</TT> instance is called an <TT>ejabberd</TT> node.
 Those <TT>ejabberd</TT> nodes use a special Erlang communication method to
 build the cluster, and EPMD is again needed listening in the port 4369.
@@ -4315,9 +4392,8 @@ enabled only on one machine in the cluster.
 </LI></OL><P>You can repeat these steps for other machines supposed to serve this
 domain.</P><P> <A NAME="servicelb"></A> </P><!--TOC section Service Load-Balancing-->
 <H2 CLASS="section"><!--SEC ANCHOR --><A NAME="htoc93">6.3</A>&#XA0;&#XA0;<A HREF="#servicelb">Service Load-Balancing</A></H2><!--SEC END --><P> <A NAME="servicelb"></A> 
-</P><P> <A NAME="componentlb"></A> </P><!--TOC subsection Components Load-Balancing-->
-<H3 CLASS="subsection"><!--SEC ANCHOR --><A NAME="htoc94">6.3.1</A>&#XA0;&#XA0;<A HREF="#componentlb">Components Load-Balancing</A></H3><!--SEC END --><P> <A NAME="componentlb"></A> </P><P> <A NAME="domainlb"></A> </P><!--TOC subsection Domain Load-Balancing Algorithm-->
-<H3 CLASS="subsection"><!--SEC ANCHOR --><A NAME="htoc95">6.3.2</A>&#XA0;&#XA0;<A HREF="#domainlb">Domain Load-Balancing Algorithm</A></H3><!--SEC END --><P> <A NAME="domainlb"></A> 
+</P><P> <A NAME="domainlb"></A> </P><!--TOC subsection Domain Load-Balancing Algorithm-->
+<H3 CLASS="subsection"><!--SEC ANCHOR --><A NAME="htoc94">6.3.1</A>&#XA0;&#XA0;<A HREF="#domainlb">Domain Load-Balancing Algorithm</A></H3><!--SEC END --><P> <A NAME="domainlb"></A> 
 </P><P><TT>ejabberd</TT> includes an algorithm to load balance the components that are plugged on an <TT>ejabberd</TT> cluster. It means that you can plug one or several instances of the same component on each <TT>ejabberd</TT> cluster and that the traffic will be automatically distributed.</P><P>The default distribution algorithm try to deliver to a local instance of a component. If several local instances are available, one instance is chosen randomly. If no instance is available locally, one instance is chosen randomly among the remote component instances.</P><P>If you need a different behaviour, you can change the load balancing behaviour with the option <TT>domain_balancing</TT>. The syntax of the option is the following:
 </P><DL CLASS="description"><DT CLASS="dt-description"><B><TT>{domain_balancing, "component.example.com", BalancingCriteria}.</TT></B></DT></DL><P>Several balancing criteria are available:
 </P><UL CLASS="itemize"><LI CLASS="li-itemize">
@@ -4326,12 +4402,12 @@ domain.</P><P> <A NAME="servicelb"></A> </P><!--TOC section Service Load-Balanci
 </LI><LI CLASS="li-itemize"><TT>bare_destination</TT>: the bare JID (without resource) of the packet <TT>to</TT> attribute is used.
 </LI><LI CLASS="li-itemize"><TT>bare_source</TT>: the bare JID (without resource) of the packet <TT>from</TT> attribute is used.
 </LI></UL><P>If the value corresponding to the criteria is the same, the same component instance in the cluster will be used.</P><P> <A NAME="lbbuckets"></A> </P><!--TOC subsection Load-Balancing Buckets-->
-<H3 CLASS="subsection"><!--SEC ANCHOR --><A NAME="htoc96">6.3.3</A>&#XA0;&#XA0;<A HREF="#lbbuckets">Load-Balancing Buckets</A></H3><!--SEC END --><P> <A NAME="lbbuckets"></A> 
+<H3 CLASS="subsection"><!--SEC ANCHOR --><A NAME="htoc95">6.3.2</A>&#XA0;&#XA0;<A HREF="#lbbuckets">Load-Balancing Buckets</A></H3><!--SEC END --><P> <A NAME="lbbuckets"></A> 
 </P><P>When there is a risk of failure for a given component, domain balancing can cause service trouble. If one component is failing the service will not work correctly unless the sessions are rebalanced.</P><P>In this case, it is best to limit the problem to the sessions handled by the failing component. This is what the <TT>domain_balancing_component_number</TT> option does, making the load balancing algorithm not dynamic, but sticky on a fix number of component instances.</P><P>The syntax is:
 </P><DL CLASS="description"><DT CLASS="dt-description"><B><TT>{domain_balancing_component_number, "component.example.com", Number}.</TT></B></DT></DL><P> <A NAME="debugging"></A> </P><!--TOC chapter Debugging-->
-<H1 CLASS="chapter"><!--SEC ANCHOR --><A NAME="htoc97">Chapter&#XA0;7</A>&#XA0;&#XA0;<A HREF="#debugging">Debugging</A></H1><!--SEC END --><P> <A NAME="debugging"></A> 
+<H1 CLASS="chapter"><!--SEC ANCHOR --><A NAME="htoc96">Chapter&#XA0;7</A>&#XA0;&#XA0;<A HREF="#debugging">Debugging</A></H1><!--SEC END --><P> <A NAME="debugging"></A> 
 </P><P> <A NAME="logfiles"></A> </P><!--TOC section Log Files-->
-<H2 CLASS="section"><!--SEC ANCHOR --><A NAME="htoc98">7.1</A>&#XA0;&#XA0;<A HREF="#logfiles">Log Files</A></H2><!--SEC END --><P> <A NAME="logfiles"></A> </P><P>An <TT>ejabberd</TT> node writes two log files:
+<H2 CLASS="section"><!--SEC ANCHOR --><A NAME="htoc97">7.1</A>&#XA0;&#XA0;<A HREF="#logfiles">Log Files</A></H2><!--SEC END --><P> <A NAME="logfiles"></A> </P><P>An <TT>ejabberd</TT> node writes two log files:
 </P><DL CLASS="description"><DT CLASS="dt-description">
 	<B><TT>ejabberd.log</TT></B></DT><DD CLASS="dd-description"> is the ejabberd service log, with the messages reported by <TT>ejabberd</TT> code
 	</DD><DT CLASS="dt-description"><B><TT>erlang.log</TT></B></DT><DD CLASS="dd-description"> is the Erlang/OTP system log, with the messages reported by Erlang/OTP using SASL (System Architecture Support Libraries)
@@ -4356,12 +4432,12 @@ The ejabberdctl command <TT>reopen-log</TT>
 (please refer to section <A HREF="#ectl-commands">4.1.1</A>)
 reopens the log files,
 and also renames the old ones if you didn&#X2019;t rename them.</P><P> <A NAME="debugconsole"></A> </P><!--TOC section Debug Console-->
-<H2 CLASS="section"><!--SEC ANCHOR --><A NAME="htoc99">7.2</A>&#XA0;&#XA0;<A HREF="#debugconsole">Debug Console</A></H2><!--SEC END --><P> <A NAME="debugconsole"></A> </P><P>The Debug Console is an Erlang shell attached to an already running <TT>ejabberd</TT> server.
+<H2 CLASS="section"><!--SEC ANCHOR --><A NAME="htoc98">7.2</A>&#XA0;&#XA0;<A HREF="#debugconsole">Debug Console</A></H2><!--SEC END --><P> <A NAME="debugconsole"></A> </P><P>The Debug Console is an Erlang shell attached to an already running <TT>ejabberd</TT> server.
 With this Erlang shell, an experienced administrator can perform complex tasks.</P><P>This shell gives complete control over the <TT>ejabberd</TT> server,
 so it is important to use it with extremely care.
 There are some simple and safe examples in the article
 <A HREF="http://www.ejabberd.im/interconnect-erl-nodes">Interconnecting Erlang Nodes</A></P><P>To exit the shell, close the window or press the keys: control+c control+c.</P><P> <A NAME="watchdog"></A> </P><!--TOC section Watchdog Alerts-->
-<H2 CLASS="section"><!--SEC ANCHOR --><A NAME="htoc100">7.3</A>&#XA0;&#XA0;<A HREF="#watchdog">Watchdog Alerts</A></H2><!--SEC END --><P> <A NAME="watchdog"></A> 
+<H2 CLASS="section"><!--SEC ANCHOR --><A NAME="htoc99">7.3</A>&#XA0;&#XA0;<A HREF="#watchdog">Watchdog Alerts</A></H2><!--SEC END --><P> <A NAME="watchdog"></A> 
 </P><P><TT>ejabberd</TT> includes a watchdog mechanism that may be useful to developers
 when troubleshooting a problem related to memory usage.
 If a process in the <TT>ejabberd</TT> server consumes more memory than the configured threshold,
@@ -4381,7 +4457,7 @@ or in a conversation with the watchdog alert bot.</P><P>The syntax is:
 To remove all watchdog admins, set the option with an empty list:
 </P><PRE CLASS="verbatim">{watchdog_admins, []}.
 </PRE><P> <A NAME="i18ni10n"></A> </P><!--TOC chapter Internationalization and Localization-->
-<H1 CLASS="chapter"><!--SEC ANCHOR --><A NAME="htoc101">Appendix&#XA0;A</A>&#XA0;&#XA0;<A HREF="#i18ni10n">Internationalization and Localization</A></H1><!--SEC END --><P> <A NAME="i18ni10n"></A> 
+<H1 CLASS="chapter"><!--SEC ANCHOR --><A NAME="htoc100">Appendix&#XA0;A</A>&#XA0;&#XA0;<A HREF="#i18ni10n">Internationalization and Localization</A></H1><!--SEC END --><P> <A NAME="i18ni10n"></A> 
 </P><P>The source code of <TT>ejabberd</TT> supports localization.
 The translators can edit the
 <A HREF="http://www.gnu.org/software/gettext/">gettext</A> .po files
@@ -4416,14 +4492,15 @@ HTTP header &#X2018;Accept-Language: ru&#X2019;</TD></TR>
 </TABLE></DIV>
 <A NAME="fig:webadmmainru"></A>
 <DIV CLASS="center"><HR WIDTH="80%" SIZE=2></DIV></DIV></BLOCKQUOTE><P> <A NAME="releasenotes"></A> </P><!--TOC chapter Release Notes-->
-<H1 CLASS="chapter"><!--SEC ANCHOR --><A NAME="htoc102">Appendix&#XA0;B</A>&#XA0;&#XA0;<A HREF="#releasenotes">Release Notes</A></H1><!--SEC END --><P> <A NAME="releasenotes"></A> 
+<H1 CLASS="chapter"><!--SEC ANCHOR --><A NAME="htoc101">Appendix&#XA0;B</A>&#XA0;&#XA0;<A HREF="#releasenotes">Release Notes</A></H1><!--SEC END --><P> <A NAME="releasenotes"></A> 
 </P><P>Release notes are available from <A HREF="http://www.process-one.net/en/ejabberd/release_notes/">ejabberd Home Page</A></P><P> <A NAME="acknowledgements"></A> </P><!--TOC chapter Acknowledgements-->
-<H1 CLASS="chapter"><!--SEC ANCHOR --><A NAME="htoc103">Appendix&#XA0;C</A>&#XA0;&#XA0;<A HREF="#acknowledgements">Acknowledgements</A></H1><!--SEC END --><P> <A NAME="acknowledgements"></A> </P><P>Thanks to all people who contributed to this guide:
+<H1 CLASS="chapter"><!--SEC ANCHOR --><A NAME="htoc102">Appendix&#XA0;C</A>&#XA0;&#XA0;<A HREF="#acknowledgements">Acknowledgements</A></H1><!--SEC END --><P> <A NAME="acknowledgements"></A> </P><P>Thanks to all people who contributed to this guide:
 </P><UL CLASS="itemize"><LI CLASS="li-itemize">
 Alexey Shchepin (<A HREF="xmpp:aleksey@jabber.ru"><TT>xmpp:aleksey@jabber.ru</TT></A>)
 </LI><LI CLASS="li-itemize">Badlop (<A HREF="xmpp:badlop@jabberes.org"><TT>xmpp:badlop@jabberes.org</TT></A>)
 </LI><LI CLASS="li-itemize">Evgeniy Khramtsov (<A HREF="xmpp:xram@jabber.ru"><TT>xmpp:xram@jabber.ru</TT></A>)
 </LI><LI CLASS="li-itemize">Florian Zumbiehl (<A HREF="xmpp:florz@florz.de"><TT>xmpp:florz@florz.de</TT></A>)
+</LI><LI CLASS="li-itemize">Ludovic Bocquet (<A HREF="xmpp:lbocquet@jabber.org"><TT>xmpp:lbocquet@jabber.org</TT></A>)
 </LI><LI CLASS="li-itemize">Marcin Owsiany (<A HREF="xmpp:marcin.owsiany@gmail.com"><TT>xmpp:marcin.owsiany@gmail.com</TT></A>)
 </LI><LI CLASS="li-itemize">Michael Grigutsch (<A HREF="xmpp:migri@jabber.i-pobox.net"><TT>xmpp:migri@jabber.i-pobox.net</TT></A>)
 </LI><LI CLASS="li-itemize">Mickael Remond (<A HREF="xmpp:mremond@process-one.net"><TT>xmpp:mremond@process-one.net</TT></A>)
@@ -4431,8 +4508,8 @@ Alexey Shchepin (<A HREF="xmpp:aleksey@jabber.ru"><TT>xmpp:aleksey@jabber.ru</TT
 </LI><LI CLASS="li-itemize">Sergei Golovan (<A HREF="xmpp:sgolovan@nes.ru"><TT>xmpp:sgolovan@nes.ru</TT></A>)
 </LI><LI CLASS="li-itemize">Vsevolod Pelipas (<A HREF="xmpp:vsevoload@jabber.ru"><TT>xmpp:vsevoload@jabber.ru</TT></A>)
 </LI></UL><P> <A NAME="copyright"></A> </P><!--TOC chapter Copyright Information-->
-<H1 CLASS="chapter"><!--SEC ANCHOR --><A NAME="htoc104">Appendix&#XA0;D</A>&#XA0;&#XA0;<A HREF="#copyright">Copyright Information</A></H1><!--SEC END --><P> <A NAME="copyright"></A> </P><P>Ejabberd Installation and Operation Guide.<BR>
-Copyright &#XA9; 2003 &#X2014; 2010 ProcessOne</P><P>This document is free software; you can redistribute it and/or
+<H1 CLASS="chapter"><!--SEC ANCHOR --><A NAME="htoc103">Appendix&#XA0;D</A>&#XA0;&#XA0;<A HREF="#copyright">Copyright Information</A></H1><!--SEC END --><P> <A NAME="copyright"></A> </P><P>Ejabberd Installation and Operation Guide.<BR>
+Copyright &#XA9; 2003 &#X2014; 2013 ProcessOne</P><P>This document is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
 as published by the Free Software Foundation; either version 2
 of the License, or (at your option) any later version.</P><P>This document is distributed in the hope that it will be useful,

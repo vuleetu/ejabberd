@@ -5,7 +5,7 @@
 %%% Created : 11 Jan 2004 by Alexey Shchepin <alexey@process-one.net>
 %%%
 %%%
-%%% ejabberd, Copyright (C) 2002-2011   ProcessOne
+%%% ejabberd, Copyright (C) 2002-2013   ProcessOne
 %%%
 %%% This program is free software; you can redistribute it and/or
 %%% modify it under the terms of the GNU General Public License as
@@ -190,7 +190,7 @@ process(["help" | Mode]) ->
 	    print_usage_help(MaxC, ShCode),
 	    ?STATUS_SUCCESS;
 	[CmdString | _] ->
-	    {ok, CmdStringU, _} = regexp:gsub(CmdString, "-", "_"),
+	    CmdStringU = ejabberd_regexp:greplace(CmdString, "-", "_"),
 	    print_usage_commands(CmdStringU, MaxC, ShCode),
 	    ?STATUS_SUCCESS
     end;
@@ -269,8 +269,8 @@ try_call_command(Args, Auth, AccessCommands) ->
     try call_command(Args, Auth, AccessCommands) of
 	{error, command_unknown} ->
 	    {io_lib:format("Error: command ~p not known.", [hd(Args)]), ?STATUS_ERROR};
-	{error, wrong_number_parameters} ->
-	    {"Error: wrong number of parameters", ?STATUS_ERROR};
+	{error, wrong_command_arguments} ->
+	    {"Error: wrong arguments", ?STATUS_ERROR};
 	Res ->
 	    Res
     catch
@@ -281,7 +281,7 @@ try_call_command(Args, Auth, AccessCommands) ->
 
 %% @spec (Args::[string()], Auth, AccessCommands) -> string() | integer() | {string(), integer()} | {error, ErrorType}
 call_command([CmdString | Args], Auth, AccessCommands) ->
-    {ok, CmdStringU, _} = regexp:gsub(CmdString, "-", "_"),
+    CmdStringU = ejabberd_regexp:greplace(CmdString, "-", "_"),
     Command = list_to_atom(CmdStringU),
     case ejabberd_commands:get_command_format(Command) of
 	{error, command_unknown} ->
@@ -292,7 +292,18 @@ call_command([CmdString | Args], Auth, AccessCommands) ->
 		    Result = ejabberd_commands:execute_command(AccessCommands, Auth, Command,
 							       ArgsFormatted),
 		    format_result(Result, ResultFormat);
+		%% This case clause is for Erlang R14 and older
 		{'EXIT', {function_clause,[{lists,zip,[A1, A2]} | _]}} ->
+		    {NumCompa, TextCompa} =
+			case {length(A1), length(A2)} of
+			    {L1, L2} when L1 < L2 -> {L2-L1, "less argument"};
+			    {L1, L2} when L1 > L2 -> {L1-L2, "more argument"}
+			end,
+		    {io_lib:format("Error: the command ~p requires ~p ~s.",
+				   [CmdString, NumCompa, TextCompa]),
+		     wrong_command_arguments};
+		%% This case clause is for Erlang R15 and newer
+		{'EXIT', {function_clause,[{lists,zip,[A1, A2],_} | _]}} ->
 		    {NumCompa, TextCompa} =
 			case {length(A1), length(A2)} of
 			    {L1, L2} when L1 < L2 -> {L2-L1, "less argument"};
@@ -637,7 +648,7 @@ print_usage_help(MaxC, ShCode) ->
     ArgsDef = [],
     C = #ejabberd_commands{
       desc = "Show help of ejabberd commands",
-      longdesc = LongDesc,
+      longdesc = lists:flatten(LongDesc),
       args = ArgsDef,
       result = {help, string}},
     print_usage_command("help", C, MaxC, ShCode).
@@ -678,13 +689,13 @@ filter_commands(All, SubString) ->
     end.
 
 filter_commands_regexp(All, Glob) ->
-    RegExp = regexp:sh_to_awk(Glob),
+    RegExp = ejabberd_regexp:sh_to_awk(Glob),
     lists:filter(
       fun(Command) ->
-	      case regexp:first_match(Command, RegExp) of
-		  {match, _, _} ->
+	      case ejabberd_regexp:run(Command, RegExp) of
+		  match ->
 		      true;
-		  _ ->
+		  nomatch ->
 		      false
 	      end
       end,
