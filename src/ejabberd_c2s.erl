@@ -105,7 +105,8 @@
 		ack_enabled = false,
 		%% ack_out_pending is a queue of {N, El}
 		ack_out_pending = queue:new(),
-		ack_out_next = 0,
+		ack_out_next = 1,
+    ack_in_h = 0,
 		lang}).
 
 %-define(DBGFSM, true).
@@ -1090,6 +1091,8 @@ session_established2(El, StateData) ->
 			StateData
 		end;
 	    _ ->
+    PrevH = StateData#state.ack_in_h,
+    StateData1 = StateData#state{ack_in_h = PrevH + 1},
 		case Name of
 		    "presence" ->
 			PresenceEl = ejabberd_hooks:run_fold(
@@ -1106,12 +1109,12 @@ session_established2(El, StateData) ->
 				 server = Server,
 				 resource = ""} ->
 				?DEBUG("presence_update(~p,~n\t~p,~n\t~p)",
-				       [FromJID, PresenceEl, StateData]),
+				       [FromJID, PresenceEl, StateData1]),
 				presence_update(FromJID, PresenceEl,
-						StateData);
+						StateData1);
 			    _ ->
 				presence_track(FromJID, ToJID, PresenceEl,
-					       StateData)
+					       StateData1)
 			end;
 		    "iq" ->
 			case jlib:iq_query_info(NewEl) of
@@ -1119,24 +1122,24 @@ session_established2(El, StateData) ->
 			    when Xmlns == ?NS_PRIVACY;
 				 Xmlns == ?NS_BLOCKING ->
 				process_privacy_iq(
-				  FromJID, ToJID, IQ, StateData);
+				  FromJID, ToJID, IQ, StateData1);
 			    _ ->
 				ejabberd_hooks:run(
 				  user_send_packet,
 				  Server,
 				  [FromJID, ToJID, NewEl]),
-				check_privacy_route(FromJID, StateData, FromJID, ToJID, NewEl),
-				StateData
+				check_privacy_route(FromJID, StateData1, FromJID, ToJID, NewEl),
+				StateData1
 			end;
 		    "message" ->
 			ejabberd_hooks:run(user_send_packet,
 					   Server,
 					   [FromJID, ToJID, NewEl]),
-			check_privacy_route(FromJID, StateData, FromJID,
+			check_privacy_route(FromJID, StateData1, FromJID,
 					    ToJID, NewEl),
-			StateData;
+			StateData1;
 		    _ ->
-			StateData
+			StateData1
 		end
 	end,
     ejabberd_hooks:run(c2s_loop_debug, [{xmlstreamelement, El}]),
@@ -1637,9 +1640,7 @@ send_element_ack(StateData, El) ->
 		SeqNumber = StateData#state.ack_out_next,
 		%% We might want to include a 'b' attribute too,
 		%% if the client has unacked stanzas.
-		AckEl = {xmlelement, "r",
-			 [{"xmlns", ?NS_STREAM_MGNT},
-			  {"c", integer_to_list(SeqNumber)}], []},
+		AckEl = {xmlelement, "r", [{"xmlns", ?NS_STREAM_MGNT}], []},
 
 		NextNumber = SeqNumber + 1,
 		Pending = queue:in({SeqNumber, El}, StateData#state.ack_out_pending),
@@ -1708,11 +1709,6 @@ is_ack_packet({xmlelement, _Name, Attrs, _SubEls}) ->
 handle_ack_element({xmlelement, Name, Attrs, _SubEls}, StateData) ->
     ?INFO_MSG("in handle_ack_element", []),
     case Name of
-	"ping" ->
-	    send_element(StateData,
-			 {xmlelement, "pong",
-			  [{"xmlns", ?NS_STREAM_MGNT}], []}),
-	    StateData;
 	"enable" ->
 	    %% We don't support session restart for now
 	    send_element(StateData,
@@ -1720,15 +1716,16 @@ handle_ack_element({xmlelement, Name, Attrs, _SubEls}, StateData) ->
 			  [{"xmlns", ?NS_STREAM_MGNT}], []}),
 	    StateData#state{ack_enabled = true};
 	"r" ->
-	    C = xml:get_attr_s("c", Attrs),
+	    H = integer_to_list(StateData#state.ack_in_h),
 	    send_element(StateData,
 			 {xmlelement, "a",
 			  [{"xmlns", ?NS_STREAM_MGNT},
-			   {"b", C}],
+			   {"h", H}],
 			  []}),
-	    ack_pending(xml:get_attr_s("b", Attrs), StateData);
+      StateData;
+			%ack_pending(xml:get_attr_s("b", Attrs), StateData);
 	"a" ->
-	    ack_pending(xml:get_attr_s("b", Attrs), StateData)
+	    ack_pending(xml:get_attr_s("h", Attrs), StateData)
     end.
 
 resend_unacked_stanzas(StateData) ->
@@ -1756,7 +1753,10 @@ ack_pending(BStr, StateData) ->
 	    B = list_to_integer(BStr),
 	    %% All stanzas numbered B or less have been successfully acked.
 	    Unacked = StateData#state.ack_out_pending,
-	    StateData#state{ack_out_pending = cut_below(B, Unacked)}
+      ?INFO_MSG("Current queue length is ~b, Processed by remote is ~s", [queue:len(Unacked), BStr]),
+      Queue = cut_below(B, Unacked),
+      ?INFO_MSG("After cutted, queue length is ~b", [queue:len(Queue)]),
+	    StateData#state{ack_out_pending = Queue}
     end.
 
 cut_below(B, Q) ->
