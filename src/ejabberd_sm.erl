@@ -507,8 +507,32 @@ do_route(From, To, Packet) ->
 		Ss ->
 		    Session = lists:max(Ss),
 		    Pid = element(2, Session#session.sid),
-		    ?DEBUG("sending to process ~p~n", [Pid]),
-		    Pid ! {route, From, To, Packet}
+        case Name of
+          "message" ->
+            At = xml:get_attr_s("type", Attrs),
+            if At /= "error" ->
+              IsAllowed = ejabberd_hooks:run_fold(
+                   msg_prepare_to_be_sent, LServer,
+                   allow, [From, To, Packet]),
+              ?DEBUG("~p to send meessage from ~n~p~nto~n~p~n", [IsAllowed, From, To]),
+              if
+                IsAllowed /= allow ->
+                  Err = jlib:make_error_reply(
+                    Packet, ?ERR_NOT_ALLOWED),
+                  ejabberd_router:route(To, From, Err),
+                  ok;
+                true ->
+                  ?DEBUG("sending to process ~p~n", [Pid]),
+                  Pid ! {route, From, To, Packet}
+              end;
+            true ->
+              ?DEBUG("sending to process ~p~n", [Pid]),
+              Pid ! {route, From, To, Packet}
+          end;
+          _ ->
+            ?DEBUG("sending to process ~p~n", [Pid]),
+            Pid ! {route, From, To, Packet}
+        end
 	    end
     end.
 
@@ -540,53 +564,85 @@ is_privacy_allow(From, To, Packet, PrivacyList) ->
 route_message(From, To, Packet) ->
     LUser = To#jid.luser,
     LServer = To#jid.lserver,
+    IsAllowed = ejabberd_hooks:run_fold(
+	       msg_prepare_to_be_sent, LServer,
+	       allow, [From, To, Packet]),
+    ?DEBUG("~p to send meessage from ~n~p~nto~n~p~n", [IsAllowed, From, To]),
     PrioRes = get_user_present_resources(LUser, LServer),
     case catch lists:max(PrioRes) of
 	{Priority, _R} when is_integer(Priority), Priority >= 0 ->
-	    lists:foreach(
-	      %% Route messages to all priority that equals the max, if
-	      %% positive
-	      fun({P, R}) when P == Priority ->
-		      LResource = jlib:resourceprep(R),
-		      USR = {LUser, LServer, LResource},
-		      case mnesia:dirty_index_read(session, USR, #session.usr) of
-			  [] ->
-			      ok; % Race condition
-			  Ss ->
-			      Session = lists:max(Ss),
-			      Pid = element(2, Session#session.sid),
-			      ?DEBUG("sending to process ~p~n", [Pid]),
-			      Pid ! {route, From, To, Packet}
-		      end;
-		 %% Ignore other priority:
-		 ({_Prio, _Res}) ->
-		      ok
-	      end,
-	      PrioRes);
+      if
+        IsAllowed == allow ->
+        lists:foreach(
+          %% Route messages to all priority that equals the max, if
+          %% positive
+          fun({P, R}) when P == Priority ->
+            LResource = jlib:resourceprep(R),
+            USR = {LUser, LServer, LResource},
+            case mnesia:dirty_index_read(session, USR, #session.usr) of
+          [] ->
+              ok; % Race condition
+          Ss ->
+              Session = lists:max(Ss),
+              Pid = element(2, Session#session.sid),
+              ?DEBUG("sending to process ~p~n", [Pid]),
+              Pid ! {route, From, To, Packet}
+            end;
+       %% Ignore other priority:
+       ({_Prio, _Res}) ->
+            ok
+          end,
+          PrioRes);
+      true ->
+			    Err = jlib:make_error_reply(
+				    Packet, ?ERR_NOT_ALLOWED),
+			    ejabberd_router:route(To, From, Err)
+      end;
 	_ ->
 	    case xml:get_tag_attr_s("type", Packet) of
 		"error" ->
 		    ok;
 		"groupchat" ->
-		    bounce_offline_message(From, To, Packet);
+        if
+          IsAllowed == allow ->
+            bounce_offline_message(From, To, Packet);
+        true ->
+            Err = jlib:make_error_reply(
+              Packet, ?ERR_NOT_ALLOWED),
+            ejabberd_router:route(To, From, Err)
+        end;
 		"headline" ->
-		    bounce_offline_message(From, To, Packet);
+        if
+          IsAllowed == allow ->
+            bounce_offline_message(From, To, Packet);
+        true ->
+            Err = jlib:make_error_reply(
+              Packet, ?ERR_NOT_ALLOWED),
+            ejabberd_router:route(To, From, Err)
+        end;
 		_ ->
-		    case ejabberd_auth:is_user_exists(LUser, LServer) of
-			true ->
-			    case is_privacy_allow(From, To, Packet) of
-				true ->
-				    ejabberd_hooks:run(offline_message_hook,
-						       LServer,
-						       [From, To, Packet]);
-				false ->
-				    ok
-			    end;
-			_ ->
-			    Err = jlib:make_error_reply(
-				    Packet, ?ERR_SERVICE_UNAVAILABLE),
-			    ejabberd_router:route(To, From, Err)
-		    end
+        if
+          IsAllowed == allow ->
+            case ejabberd_auth:is_user_exists(LUser, LServer) of
+          true ->
+              case is_privacy_allow(From, To, Packet) of
+            true ->
+                ejabberd_hooks:run(offline_message_hook,
+                       LServer,
+                       [From, To, Packet]);
+            false ->
+                ok
+              end;
+          _ ->
+              Err = jlib:make_error_reply(
+                Packet, ?ERR_SERVICE_UNAVAILABLE),
+              ejabberd_router:route(To, From, Err)
+            end;
+        true ->
+            Err = jlib:make_error_reply(
+              Packet, ?ERR_NOT_ALLOWED),
+            ejabberd_router:route(To, From, Err)
+        end
 	    end
     end.
 

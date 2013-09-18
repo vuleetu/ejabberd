@@ -1629,6 +1629,7 @@ send_trailer(StateData) ->
 
 %% Only ack message
 send_element_ack(StateData, {xmlelement, "message", _, _} = El) ->
+    ?DEBUG("Send ack now for ~p", [El]),
     ElText = xml:element_to_string(El),
     {AckText, NewState} =
 	case StateData#state.ack_enabled of
@@ -1651,7 +1652,9 @@ send_element_ack(StateData, {xmlelement, "message", _, _} = El) ->
 	end,
     send_text(NewState, [ElText, AckText]),
     NewState;
-send_element_ack(StateData, _El) ->
+send_element_ack(StateData, El) ->
+    ?DEBUG("Not a message ~p", [El]),
+    send_element(StateData, El),
     StateData.
 
 
