@@ -1091,8 +1091,6 @@ session_established2(El, StateData) ->
 			StateData
 		end;
 	    _ ->
-    PrevH = StateData#state.ack_in_h,
-    StateData1 = StateData#state{ack_in_h = PrevH + 1},
 		case Name of
 		    "presence" ->
 			PresenceEl = ejabberd_hooks:run_fold(
@@ -1109,12 +1107,12 @@ session_established2(El, StateData) ->
 				 server = Server,
 				 resource = ""} ->
 				?DEBUG("presence_update(~p,~n\t~p,~n\t~p)",
-				       [FromJID, PresenceEl, StateData1]),
+				       [FromJID, PresenceEl, StateData]),
 				presence_update(FromJID, PresenceEl,
-						StateData1);
+						StateData);
 			    _ ->
 				presence_track(FromJID, ToJID, PresenceEl,
-					       StateData1)
+					       StateData)
 			end;
 		    "iq" ->
 			case jlib:iq_query_info(NewEl) of
@@ -1122,16 +1120,18 @@ session_established2(El, StateData) ->
 			    when Xmlns == ?NS_PRIVACY;
 				 Xmlns == ?NS_BLOCKING ->
 				process_privacy_iq(
-				  FromJID, ToJID, IQ, StateData1);
+				  FromJID, ToJID, IQ, StateData);
 			    _ ->
 				ejabberd_hooks:run(
 				  user_send_packet,
 				  Server,
 				  [FromJID, ToJID, NewEl]),
-				check_privacy_route(FromJID, StateData1, FromJID, ToJID, NewEl),
-				StateData1
+				check_privacy_route(FromJID, StateData, FromJID, ToJID, NewEl),
+				StateData
 			end;
 		    "message" ->
+      PrevH = StateData#state.ack_in_h,
+      StateData1 = StateData#state{ack_in_h = PrevH + 1},
 			ejabberd_hooks:run(user_send_packet,
 					   Server,
 					   [FromJID, ToJID, NewEl]),
@@ -1139,7 +1139,7 @@ session_established2(El, StateData) ->
 					    ToJID, NewEl),
 			StateData1;
 		    _ ->
-			StateData1
+			StateData
 		end
 	end,
     ejabberd_hooks:run(c2s_loop_debug, [{xmlstreamelement, El}]),
@@ -1627,7 +1627,8 @@ send_trailer(StateData) when StateData#state.xml_socket ->
 send_trailer(StateData) ->
     send_text(StateData, ?STREAM_TRAILER).
 
-send_element_ack(StateData, El) ->
+%% Only ack message
+send_element_ack(StateData, {xmlelement, "message", _, _} = El) ->
     ElText = xml:element_to_string(El),
     {AckText, NewState} =
 	case StateData#state.ack_enabled of
@@ -1649,7 +1650,9 @@ send_element_ack(StateData, El) ->
 				 ack_out_pending = Pending}}
 	end,
     send_text(NewState, [ElText, AckText]),
-    NewState.
+    NewState;
+send_element_ack(StateData, _El) ->
+    StateData.
 
 
 new_id() ->
