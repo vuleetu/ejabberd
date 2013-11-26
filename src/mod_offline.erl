@@ -149,12 +149,13 @@ store_offline_msg(Host, {User, _Server}, Msgs, Len, MaxOfflineMsgs, odbc) ->
 					    (M#offline_msg.to)#jid.luser),
                               From = M#offline_msg.from,
                               To = M#offline_msg.to,
-                              {xmlelement, Name, Attrs, Els} =
+                              {xmlelement, Name, Attrs, Els1} =
                                   M#offline_msg.packet,
                               Attrs2 = jlib:replace_from_to_attrs(
                                          jlib:jid_to_string(From),
                                          jlib:jid_to_string(To),
                                          Attrs),
+                              Els = replace_els_body(encode, Els1, []),
                               Packet = {xmlelement, Name, Attrs2,
                                         Els ++
                                             [jlib:timestamp_to_xml(
@@ -174,6 +175,46 @@ store_offline_msg(Host, {User, _Server}, Msgs, Len, MaxOfflineMsgs, odbc) ->
                       end, Msgs),
             odbc_queries:add_spool(Host, Query)
     end.
+
+replace_els_body(encode, [], Stack) ->
+    lists:reverse(Stack);
+replace_els_body(encode, XML, Stack) when is_tuple(XML) ->
+    replace_els_body(encode, [XML], Stack);
+replace_els_body(encode, [{_, "body", _, Sub}|Rest], Stack) ->
+    Res = do_replace_els_body(encode, Sub, []),
+    replace_els_body(encode, Rest, [{xmlelement, "body", [], Res}|Stack]);
+replace_els_body(encode, [{_,Prop,Value,OtherSub}|Rest], Stack) ->
+    Res = replace_els_body(encode, OtherSub, []),
+    replace_els_body(encode, Rest, [{xmlelement, Prop, Value, Res}|Stack]);
+replace_els_body(encode, [Other|Rest], Stack) ->
+    replace_els_body(encode, Rest, [Other|Stack]);
+replace_els_body(decode, [], Stack) ->
+    lists:reverse(Stack);
+replace_els_body(decode, XML, Stack) when is_tuple(XML) ->
+    replace_els_body(decode, [XML], Stack);
+replace_els_body(decode, [{_, "body", _, Sub}|Rest], Stack) ->
+    Res = do_replace_els_body(decode, Sub, []),
+    replace_els_body(decode, Rest, [{xmlelement, "body", [], Res}|Stack]);
+replace_els_body(decode, [{_,Prop,Value,OtherSub}|Rest], Stack) ->
+    Res = replace_els_body(decode, OtherSub, []),
+    replace_els_body(decode, Rest, [{xmlelement, Prop, Value, Res}|Stack]);
+replace_els_body(decode, [Other|Rest], Stack) ->
+    replace_els_body(decode, Rest, [Other|Stack]).
+
+do_replace_els_body(encode, [], Stack) ->
+    lists:reverse(Stack);
+do_replace_els_body(encode, [{xmlcdata, DataBin}|Rest], Stack) ->
+    DataBin64 = base64:encode(DataBin),
+    do_replace_els_body(encode, Rest, [{xmlcdata, DataBin64}|Stack]);
+do_replace_els_body(encode, [Other|Rest], Stack) ->
+    do_replace_els_body(encode, Rest, [Other|Stack]);
+do_replace_els_body(decode, [], Stack) ->
+    lists:reverse(Stack);
+do_replace_els_body(decode, [{xmlcdata, DataBin}|Rest], Stack) ->
+    DataBin64 = base64:decode(DataBin),
+    do_replace_els_body(decode, Rest, [{xmlcdata, DataBin64}|Stack]);
+do_replace_els_body(decode, [Other|Rest], Stack) ->
+    do_replace_els_body(decode, Rest, [Other|Stack]).
 
 %% Function copied from ejabberd_sm.erl:
 get_max_user_messages(AccessRule, {User, Server}, Host) ->
@@ -443,7 +484,8 @@ pop_offline_messages(Ls, LUser, LServer, odbc) ->
 			    case xml_stream:parse_element(XML) of
 				{error, _Reason} ->
 				    [];
-				El ->
+				El1 ->
+                                    [El] = replace_els_body(decode, El1, []),
 				    To = jlib:string_to_jid(
 					   xml:get_tag_attr_s("to", El)),
 				    From = jlib:string_to_jid(
